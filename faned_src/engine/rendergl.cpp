@@ -2518,7 +2518,7 @@ ICOMMAND(getbuildrevision, "", (), result(buildrevision));
 string buildurl = "https://github.com/fanaticclan/client";
 ICOMMAND(getbuildurl, "", (), result(buildurl));
 
-string buildversion = "20141025022231-DEV";
+string buildversion = "20141026223022-DEV";
 ICOMMAND(getbuildversion, "", (), result(buildversion));
 
 extern int sehud;

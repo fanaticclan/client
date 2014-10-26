@@ -1,0 +1,5 @@
+// File: scope.png
+// Author: Theso (johniwas@gmail.com)
+// License: Creative Commons (BY-NC-SA)
+// Notes: Modified by Nyne; same License.
+

@@ -1,0 +1,4 @@
+// Files: suicizer_pickups.pak
+// Author: Suicizer
+// License: Creative Commons (BY-NC-SA)
+

@@ -1,0 +1,8 @@
+// Files: razgriz_hq/*
+// Author: RaZgRiZ
+// License: Creative Commons (BY-NC-SA)
+// Notes:
+
+Credits for the initial crosshair of t.png and td.png goto 1brunobruce, even though its on public license.
+I only take credit for the modifications it has undergone (which weren't extreme anyway).
+

@@ -1,0 +1,15 @@
+Created by: "K1P57A" (2009)
+Philippe Kipper
+e-mail: pkipper@gmail.com
+
+- items.png (except quad and grenade, those are from ingame gfx)
+- radar.png
+
+===========================================================================
+
+These files have been licensed under a the
+
+"Creative Commons Deed / Attribution Non-commercial Share-Alike ( at-nc-sa )" 
+
+===========================================================================
+

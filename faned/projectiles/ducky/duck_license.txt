@@ -1,0 +1,4 @@
+// Author:    antiklimax
+// Files:     Happy Ducks: Little grenade mod for fun :)
+// License:   Any kind of license does not imply a file, but all new components freely utilizable. Maded by Me...
+

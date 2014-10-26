@@ -1,57 +1,34 @@
+# Cube 2: Sauerbraten - Fanatic Edition
+*.gch
+*.o
+*.res
+bin/**
+bin64/**
+bin_unix/**
+data/**
+docs/**
+packages/**
+src/**
+*README.html
+*rpg.bat
+*rpg.exe
+*server.bat
+*server-init.cfg
+*sauer_client
+*sauer_server
+*sauerbraten.bat
+*sauerbraten.exe
+*sauerbraten.pdb
+*sauerbraten_unix
+
 # Hidden (Linux)
 .*
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-#*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Packages
-*.7z
-*.bz2
-*.bzip
-*.cab
-*.deb
-*.dmg
-*.egg
-*.gem
-*.gz
-*.iso
-*.jar
-*.lzma
-*.msi
-*.msm
-*.msp
-*.rar
-*.rpm
-*.tar
-*.xpi
-*.xz
-*.zip
+# Logs and databases
+*.dat
+*.log
+*.sql
+*.sqlite
 
 # OS generated
 ._*
@@ -64,11 +41,6 @@
 ehthumbs.db
 Thumbs.db
 
-# Logs and databases
-*.log
-*.sql
-*.sqlite
-
 # Vim
 *~
 .netrwhist
@@ -76,34 +48,4 @@ Thumbs.db
 [._]s[a-w][a-z]
 Session.vim
 *.un~
-
-# Cube 2: Sauerbraten
-bin/**
-bin64/**
-bin_unix/**
-data/**
-docs/**
-packages/**
-src/**
-*README.html
-*rpg.bat
-*rpg.exe
-*server.bat
-*sauer_client
-*sauer_server
-*sauerbraten.bat
-*sauerbraten.exe
-*sauerbraten.pdb
-*sauerbraten_unix
-
-# Development
-faned/**
-*.cfg*
-*.dat*
-*_compile*
-*_reset*
-*_todo*
-sauerbraten.cbp
-sauerbraten.depend
-sauerbraten.layout
 

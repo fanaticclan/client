@@ -77,8 +77,6 @@
 
 <sub>`abort` Use this for proper crashing FanEd without saving changes to config files;</sub><br />
 <sub>`anticheat 0|1` Enable or disable the anticheat detection system;</sub><br />
-<sub>`antiflood 0|1` Enable or disable the antiflood system (chatmessages, servermessages, switchnames, remips, newmaps);</sub><br />
-<sub>`antifloodlimit iNT` Set the antiflood limit in milliseconds;</sub><br />
 <sub>`codepad` Helper for CubeScript/Lua ingame scripting;</sub><br />
 <sub>`date %FORMAT` Returns the current date/time in given format; example: `echo (date %Y-%m-%d %H:%M:%S)`;</sub><br />
 <sub>`getconline` Get the last console output; for specific words use `(at $getconline iNT)`;</sub><br />

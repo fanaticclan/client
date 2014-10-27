@@ -48,6 +48,7 @@ void execlua(const char *luafile)
     lua_error(L, status);
 }
 ICOMMAND(execlua, "s", (char *file), execlua(file));
+ICOMMAND(execl, "s", (char *file), execl(file)); // CMEd Legacy;
 
 int lua_sauer(lua_State *L)
 {
@@ -655,6 +656,7 @@ int init_lua()
     lua_register(L, "sauer_edittex",        lua_edittex);
     lua_register(L, "sauer_editent",        lua_editent);
     lua_register(L, "sauer_getcubeinfo",    lua_getcubeinfo);
+    lua_register(L, "sauer_sel",            lua_getsel); // CMEd Legacy;
     lua_register(L, "sauer_getsel",         lua_getsel);
     lua_register(L, "sauer_setsel",         lua_setsel);
     lua_register(L, "sauer_vcolor",         lua_vcolor);
@@ -677,4 +679,5 @@ int init_lua()
 
 ICOMMAND(initlua, "", (), init_lua(););
 ICOMMAND(resetlua, "", (), { lua_close(L); init_lua(); });
+ICOMMAND(reset_lua,"",(),{lua_close(L); init_lua();}); // CMEd Legacy;
 

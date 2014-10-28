@@ -77,6 +77,7 @@ CLIENT_LIBS+= -lrt
 endif         
 endif
 CLIENT_OBJS= \
+        luajit/lua.o \
 	shared/crypto.o \
 	shared/geom.o \
 	shared/stream.o \
@@ -245,6 +246,10 @@ depend:
 
 # DO NOT DELETE
 
+luajit/lua.o: engine/engine.h shared/cube.h shared/tools.h shared/geom.h
+luajit/lua.o: shared/ents.h shared/command.h shared/iengine.h shared/igame.h
+luajit/lua.o: engine/world.h engine/octa.h engine/lightmap.h engine/bih.h
+luajit/lua.o: engine/texture.h engine/model.h engine/varray.h
 shared/crypto.o: shared/cube.h shared/tools.h shared/geom.h shared/ents.h
 shared/crypto.o: shared/command.h shared/iengine.h shared/igame.h
 shared/geom.o: shared/cube.h shared/tools.h shared/geom.h shared/ents.h

@@ -1,5 +1,4 @@
 // Start: Fanatic Edition
-#include "../luajit/lua.h"
 #include "game.h"
 #include "engine.h"
 

@@ -1,4 +1,5 @@
-// Start: Fanatic Edition
+// Original irc.h from Red Eclipse; ported to Sauerbraten by AngrySnout, modified by Nyne for Fanatic Edition
+
 #ifndef IRC_H
 #define IRC_H
 
@@ -96,4 +97,4 @@ extern void irccleanup();
 extern void ircslice();
 
 #endif
-// End: Fanatic Edition
+

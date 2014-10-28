@@ -1,4 +1,4 @@
-//original irc.cpp from Red Eclipse; ported to Sauerbraten by AngrySnout, modified by Nyne for Fanatic Edition
+// Original irc.cpp from Red Eclipse; ported to Sauerbraten by AngrySnout, modified by Nyne for Fanatic Edition
 
 #include "irc.h"
 

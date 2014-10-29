@@ -2620,7 +2620,7 @@ void gl_drawhud(int w, int h)
 
             if(showspeed && !sehud) // Fanatic Edition
             {
-                float speed = game::player1->vel.magnitude2();
+                float speed = game::player1->vel.magnitude();
                 speed+= 0.5;
                 int result = (int)speed;
                 draw_textf("speed %d", conw-5*FONTH, conh-FONTH*3/2, result);

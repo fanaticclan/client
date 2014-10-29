@@ -388,7 +388,7 @@ namespace game
         if(editmode) return true;
         if(isconnected() && multiplayer(false) && !m_edit)
         {
-            conoutf(CON_ERROR, "editing in multiplayer requires coop edit mode (1)");
+            conoutf(CON_ERROR, "\f9FanEd\f7::edittoggle: \f3#error: \f7editing in multiplayer requires coop edit mode (1)");
             playsound(S_ERROR);
             return false;
         }
@@ -668,13 +668,15 @@ namespace game
 
     void dowhoisdump(int cn)
     {
-	SDL_Thread * Thread;
-	Thread = SDL_CreateThread(whoisdump, (void *)cn);
-        if(NULL == Thread)
+        SDL_Thread * thread;
+        int threadReturnValue;
+        thread = SDL_CreateThread(whoisdump, (void *)cn);
+        if(NULL == thread)
         {
             conoutf(CON_ERROR, "\f9FanEd\f7::whoisdump: \f3#error: \f7SDL_CreateThread failed: \f4%s", SDL_GetError());
             playsound(S_ERROR);
         }
+        else SDL_WaitThread(thread, &threadReturnValue);
     }
     ICOMMAND(whoisdump, "i", (int *cn), dowhoisdump(*cn));
     
@@ -787,13 +789,15 @@ namespace game
 
     void dowhois(int cn)
     {
-	SDL_Thread * Thread;
-	Thread = SDL_CreateThread(whois, (void *)cn);
-        if(NULL == Thread)
+        SDL_Thread * thread;
+        int threadReturnValue;
+        thread = SDL_CreateThread(whois, (void *)cn);
+        if(NULL == thread)
         {
             conoutf(CON_ERROR, "\f9FanEd\f7::whois: \f3#error: \f7SDL_CreateThread failed: \f4%s", SDL_GetError());
             playsound(S_ERROR);
         }
+        else SDL_WaitThread(thread, &threadReturnValue);
     }
     ICOMMAND(whois, "i", (int *cn), dowhois(*cn));
 
@@ -830,13 +834,15 @@ namespace game
 
     void dowhowas(const char *name)
     {
-	SDL_Thread * Thread;
-	Thread = SDL_CreateThread(whowas, (void *)(int)name);
-        if(NULL == Thread)
+        SDL_Thread * thread;
+        int threadReturnValue;
+        thread = SDL_CreateThread(whowas, (void *)(int)name);
+        if(NULL == thread)
         {
             conoutf(CON_ERROR, "\f9FanEd\f7::whowas: \f3#error: \f7SDL_CreateThread failed: \f4%s", SDL_GetError());
             playsound(S_ERROR);
         }
+        else SDL_WaitThread(thread, &threadReturnValue);
     }
     ICOMMAND(whowas, "s", (const char *name), dowhowas(name));
     // End: Fanatic Edition

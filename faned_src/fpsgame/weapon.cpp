@@ -6,19 +6,19 @@ VARP(blood, 0, 1, 1);
 HVARP(bloodcolor, 0, 0x9F0000, 0xFFFFFF);
 FVARP(bloodintensity, 0, 5.0f, INT_MAX);
 
-HVARP(sgshotcolor, 0, 0xFFCC00, 0xFFFFFF);
+HVARP(sgshotcolor, 0, 0xFF7700, 0xFFFFFF);
 VARP(sgshotduration, 1, 100, 10000);
 FVARP(sgshotsize, 0, 0.24f, 50.0f);
 
-HVARP(cgshotcolor, 0, 0xFFCC00, 0xFFFFFF);
+HVARP(cgshotcolor, 0, 0xFF7700, 0xFFFFFF);
 VARP(cgshotduration, 1, 250, 10000);
 FVARP(cgshotsize, 0, 0.24f, 50.0f);
 
-HVARP(pishotcolor, 0, 0xFFCC00, 0xFFFFFF);
+HVARP(pishotcolor, 0, 0xFF7700, 0xFFFFFF);
 VARP(pishotduration, 1, 250, 10000);
 FVARP(pishotsize, 0, 0.24f, 50.0f);
 
-HVARP(riiflarecolor, 0, 0xFFCC00, 0xFFFFFF);
+HVARP(riflarecolor, 0, 0xFF7700, 0xFFFFFF);
 VARP(riflareduration, 1, 250, 10000);
 FVARP(riflaresize, 0, 0.24f, 50.0f);
 
@@ -803,7 +803,7 @@ namespace game
                 if(ritrailsmoke)
                 {
                     particle_trail(PART_SMOKE, rishotduration, hudgunorigin(gun, from, to, d), to, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), rishotsize, rishotgravity);
-                    particle_flare(hudgunorigin(gun, from, to, d), to, 300, PART_STREAK, 0xFF5500, 0.24f);
+                    particle_flare(hudgunorigin(gun, from, to, d), to, riflareduration, PART_STREAK, riflarecolor, riflaresize);
                 }
                 if(ritrailspin)
                 {

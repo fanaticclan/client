@@ -530,7 +530,7 @@ namespace game
     string centerconsolestring;
     string centerconsolemessage1;
     string centerconsolemessage2;
-    int owned = 0;
+    int greatshot = 0;
 
     void killed(fpsent *d, fpsent *actor)
     {
@@ -666,10 +666,10 @@ namespace game
 
                     if(d->vel.magnitude() >= 190)
                     {
-                        playsound(S_OWNED);
-                        owned = 1;
+                        playsound(S_GREATSHOT);
+                        greatshot = 1;
                     }
-                    else owned = 0;
+                    else greatshot = 0;
                 }
             }
         }
@@ -716,10 +716,6 @@ namespace game
             disablezoom();
             playsound(S_INTERMISSION);
             // Start: Fanatic Edition
-            centerconsolespecies2 = 1;
-            centerconsoletime2 = totalmillis;
-            defformatstring(centerconsolestring)("\fZintermission");
-            copystring(centerconsolemessage2, centerconsolestring);
             if(autosaygg) toserver(autosayggmsg);
             if(identexists("intermission")) execute("intermission");
             if(identexists("onintermission")) execute("onintermission");
@@ -1518,13 +1514,13 @@ namespace game
 
         if(centerconsole)
         {
-            if(centerconsolespecies1 && totalmillis - centerconsoletime1 <= centerconsoledelay && owned)
+            if(centerconsolespecies1 && totalmillis - centerconsoletime1 <= centerconsoledelay && greatshot)
             {
                 int tw, th;
-                text_bounds("owned!", tw, th);
+                text_bounds("Great Shot!", tw, th);
                 glPushMatrix();
                 glScalef(1/2.5f, 1/2.5f, 1);
-                draw_textfa("%s", centerconsolealpha, (w*2.5f - tw)/2, h*2.5f-600, "\fZowned!");
+                draw_textfa("\fTGreat Shot!", centerconsolealpha, (w*2.5f - tw)/2, h*2.5f-600);
                 glPopMatrix();
             }
 

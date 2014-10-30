@@ -246,7 +246,7 @@ enum
     S_ROCKET,
 
     S_HEARTBEAT,
-    S_OWNED,
+    S_GREATSHOT,
 
     S_CHAT,
     S_RESPAWN,

@@ -5,7 +5,7 @@
 #####₪ Features
 
 <sub>★ Ingame IRC</sub><br />
-<sub>★ Lua support</sub><br />
+<sub>★ Lua scripting</sub><br />
 <sub>★ Image importing</sub><br />
 <sub>★ Object importing</sub><br />
 <sub>★ Ingame file sharing</sub><br />
@@ -375,7 +375,7 @@
 
 <sub>> Note: You can edit .lua files on the fly; just run `resetlua` after your edits to update;</sub><br />
 
-<sub>> Implemented C++ hooks for Lua Scriping:</sub><br />
+<sub>> Implemented C++ hooks for Lua usage:</sub><br />
 
 <sub>`sauer()`</sub><br />
 <sub>`sauer_build()`</sub><br />

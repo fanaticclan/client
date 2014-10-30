@@ -157,7 +157,7 @@
 <sub>`radarteammatesplayerstarts 0|1` Enable or disable radar icons for playerstarts (own team);</sub><br />
 <sub>`riflareduration iNT`</sub><br />
 <sub>`riflaresize FLOAT`</sub><br />
-<sub>`riiflarecolor RGB|HEX`</sub><br />
+<sub>`riflarecolor RGB|HEX`</sub><br />
 <sub>`rishotduration iNT`</sub><br />
 <sub>`rishotgravity iNT`</sub><br />
 <sub>`rishotsize FLOAT`</sub><br />

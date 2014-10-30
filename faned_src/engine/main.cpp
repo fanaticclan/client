@@ -660,7 +660,7 @@ VARFP(gamma, 30, 100, 300,
 {
     if(gamma == curgamma) return;
     curgamma = gamma;
-	float f = gamma/100.0f;
+    float f = gamma/100.0f;
     if(SDL_SetGamma(f,f,f)==-1) conoutf(CON_ERROR, "Could not set gamma: %s", SDL_GetError());
 });
 
@@ -1064,26 +1064,26 @@ void stackdumper(unsigned int type, EXCEPTION_POINTERS *ep)
     formatstring(out)("Cube 2: Sauerbraten Win32 Exception: 0x%x [0x%x]\n\n", er->ExceptionCode, er->ExceptionCode==EXCEPTION_ACCESS_VIOLATION ? er->ExceptionInformation[1] : -1);
     SymInitialize(GetCurrentProcess(), NULL, TRUE);
 #ifdef _AMD64_
-	STACKFRAME64 sf = {{context->Rip, 0, AddrModeFlat}, {}, {context->Rbp, 0, AddrModeFlat}, {context->Rsp, 0, AddrModeFlat}, 0};
+    STACKFRAME64 sf = {{context->Rip, 0, AddrModeFlat}, {}, {context->Rbp, 0, AddrModeFlat}, {context->Rsp, 0, AddrModeFlat}, 0};
     while(::StackWalk64(IMAGE_FILE_MACHINE_AMD64, GetCurrentProcess(), GetCurrentThread(), &sf, context, NULL, ::SymFunctionTableAccess, ::SymGetModuleBase, NULL))
-	{
-		union { IMAGEHLP_SYMBOL64 sym; char symext[sizeof(IMAGEHLP_SYMBOL64) + sizeof(string)]; };
-		sym.SizeOfStruct = sizeof(sym);
-		sym.MaxNameLength = sizeof(symext) - sizeof(sym);
-		IMAGEHLP_LINE64 line;
-		line.SizeOfStruct = sizeof(line);
+    {
+        union { IMAGEHLP_SYMBOL64 sym; char symext[sizeof(IMAGEHLP_SYMBOL64) + sizeof(string)]; };
+        sym.SizeOfStruct = sizeof(sym);
+        sym.MaxNameLength = sizeof(symext) - sizeof(sym);
+        IMAGEHLP_LINE64 line;
+        line.SizeOfStruct = sizeof(line);
         DWORD64 symoff;
-		DWORD lineoff;
+        DWORD lineoff;
         if(SymGetSymFromAddr64(GetCurrentProcess(), sf.AddrPC.Offset, &symoff, &sym) && SymGetLineFromAddr64(GetCurrentProcess(), sf.AddrPC.Offset, &lineoff, &line))
 #else
     STACKFRAME sf = {{context->Eip, 0, AddrModeFlat}, {}, {context->Ebp, 0, AddrModeFlat}, {context->Esp, 0, AddrModeFlat}, 0};
     while(::StackWalk(IMAGE_FILE_MACHINE_I386, GetCurrentProcess(), GetCurrentThread(), &sf, context, NULL, ::SymFunctionTableAccess, ::SymGetModuleBase, NULL))
-	{
-		union { IMAGEHLP_SYMBOL sym; char symext[sizeof(IMAGEHLP_SYMBOL) + sizeof(string)]; };
-		sym.SizeOfStruct = sizeof(sym);
-		sym.MaxNameLength = sizeof(symext) - sizeof(sym);
-		IMAGEHLP_LINE line;
-		line.SizeOfStruct = sizeof(line);
+    {
+        union { IMAGEHLP_SYMBOL sym; char symext[sizeof(IMAGEHLP_SYMBOL) + sizeof(string)]; };
+        sym.SizeOfStruct = sizeof(sym);
+        sym.MaxNameLength = sizeof(symext) - sizeof(sym);
+        IMAGEHLP_LINE line;
+        line.SizeOfStruct = sizeof(line);
         DWORD symoff, lineoff;
         if(SymGetSymFromAddr(GetCurrentProcess(), sf.AddrPC.Offset, &symoff, &sym) && SymGetLineFromAddr(GetCurrentProcess(), sf.AddrPC.Offset, &lineoff, &line))
 #endif
@@ -1183,11 +1183,11 @@ int main(int argc, char **argv)
         if(argv[i][0]=='-') switch(argv[i][1])
         {
             case 'q': 
-			{
-				const char *dir = sethomedir(&argv[i][2]);
-				if(dir) logoutf("Using home directory: %s", dir);
-				break;
-			}
+            {
+                const char *dir = sethomedir(&argv[i][2]);
+                if(dir) logoutf("Using home directory: %s", dir);
+                break;
+            }
         }
     }
     execfile("faned_init.cfg", false); // Fanatic Edition
@@ -1404,7 +1404,7 @@ int main(int argc, char **argv)
         timeerr = scaledtime%100;
         if(!multiplayer(false) && curtime>200) curtime = 200;
         if(game::ispaused()) curtime = 0;
-		lastmillis += curtime;
+        lastmillis += curtime;
         totalmillis = millis;
         updatetime();
  

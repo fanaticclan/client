@@ -5,14 +5,51 @@ VARP(blood, 0, 1, 1);
 // Start: Fanatic Edition
 HVARP(bloodcolor, 0, 0x9F0000, 0xFFFFFF);
 FVARP(bloodintensity, 0, 5.0f, INT_MAX);
-HVARP(shotcolor, 0, 0x222222, 0xFFFFFF);
-VARP(shotcolorrainbow, 0, 0, 1);
-VARP(shotcolorteam, 0, 0, 1);
-VARP(shotduration, 1, 500, 10000);
-VARP(shotgravity, -50, 40, 50);
-FVARP(shotwidth, 0, 0.5f, 50.0f);
+
+HVARP(sgshotcolor, 0, 0xFFCC00, 0xFFFFFF);
+VARP(sgshotduration, 1, 100, 10000);
+FVARP(sgshotsize, 0, 0.24f, 50.0f);
+
+HVARP(cgshotcolor, 0, 0xFFCC00, 0xFFFFFF);
+VARP(cgshotduration, 1, 250, 10000);
+FVARP(cgshotsize, 0, 0.24f, 50.0f);
+
+HVARP(pishotcolor, 0, 0xFFCC00, 0xFFFFFF);
+VARP(pishotduration, 1, 250, 10000);
+FVARP(pishotsize, 0, 0.24f, 50.0f);
+
+HVARP(riiflarecolor, 0, 0xFFCC00, 0xFFFFFF);
+VARP(riflareduration, 1, 250, 10000);
+FVARP(riflaresize, 0, 0.24f, 50.0f);
+
+VARP(rishotduration, 1, 500, 10000);
+VARP(rishotgravity, -50, 40, 50);
+VARP(rishotparticle, 0, 3, 4);
+FVARP(rishotsize, 0, 0.5f, 50.0f);
+
+VARP(ritraillaser, 0, 0, 1);
+VARP(ritraillightning, 0, 0, 1);
+VARP(ritrailsmoke, 0, 1, 1);
+VARP(ritrailspin, 0, 0, 1);
+
 VARP(shotsparks, 0, 1, 1);
-VARP(shotpart, 0, 3, 4);
+
+HVARP(lasercolor, 0, 0x222222, 0xFFFFFF);
+VARP(lasercolorrainbow, 0, 0, 1);
+VARP(lasercolorteam, 0, 0, 1);
+
+HVARP(lightningcolor, 0, 0x222222, 0xFFFFFF);
+VARP(lightningcolorrainbow, 0, 0, 1);
+VARP(lightningcolorteam, 0, 0, 1);
+
+HVARP(smokecolor, 0, 0x222222, 0xFFFFFF);
+VARP(smokecolorrainbow, 0, 0, 1);
+VARP(smokecolorteam, 0, 0, 1);
+
+HVARP(spincolor, 0, 0x222222, 0xFFFFFF);
+VARP(spincolorrainbow, 0, 0, 1);
+VARP(spincolorteam, 0, 0, 1);
+
 VARP(ducky, 0, 0, 1);
 // End: Fanatic Edition
 
@@ -232,12 +269,12 @@ namespace game
             bouncer &bnc = *bouncers[i];
             
             // Start: Fanatic Edition
-            int teamshotcolor;
-            if(!m_teammode) teamshotcolor = 0x32FF64;
+            int teamsmokecolor;
+            if(!m_teammode) teamsmokecolor = 0x32FF64;
             else
             {
-                if(!joinred) teamshotcolor = isteam(bnc.owner->team, player1->team) ? 0x2222FF : 0XFF2222;
-                else teamshotcolor = isteam(bnc.owner->team, player1->team) ? 0XFF2222 : 0x2222FF;
+                if(!joinred) teamsmokecolor = isteam(bnc.owner->team, player1->team) ? 0x2222FF : 0XFF2222;
+                else teamsmokecolor = isteam(bnc.owner->team, player1->team) ? 0XFF2222 : 0x2222FF;
             }
             // End: Fanatic Edition
             
@@ -246,7 +283,7 @@ namespace game
                 vec pos(bnc.o);
                 pos.add(vec(bnc.offset).mul(bnc.offsetmillis/float(OFFSETMILLIS)));
                 // Start: Fanatic Edition
-                regular_particle_splash(PART_SMOKE, 1, 150, pos, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), 2.4f, 50, -20);
+                regular_particle_splash(PART_SMOKE, 1, 150, pos, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 2.4f, 50, -20);
                 if(lookupmaterial(pos)==MAT_WATER) regular_particle_splash(PART_BUBBLE, 1, 500, pos, 0xFFFFFF, 1.0f, 25, 500);
                 // End: Fanatic Edition
             }
@@ -255,7 +292,6 @@ namespace game
             if(bnc.bouncetype==BNC_GRENADE) stopped = bounce(&bnc, 0.6f, 0.5f, 0.8f) || (bnc.lifetime -= time)<0;
             else
             {
-                // cheaper variable rate physics for debris, gibs, etc.
                 for(int rtime = time; rtime > 0;)
                 {
                     int qtime = min(30, rtime);
@@ -326,7 +362,6 @@ namespace game
 
     void removeprojectiles(fpsent *owner)
     {
-        // can't use loopv here due to strange GCC optimizer bug
         int len = projs.length();
         loopi(len) if(projs[i].owner==owner) { projs.remove(i--); len--; }
     }
@@ -445,14 +480,14 @@ namespace game
     void explode(bool local, fpsent *owner, const vec &v, dynent *safe, int damage, int gun)
     {
         // Start: Fanatic Edition
-        int teamshotcolor;
-        if(!m_teammode) teamshotcolor = 0x32FF64;
+        int teamsmokecolor;
+        if(!m_teammode) teamsmokecolor = 0x32FF64;
         else
         {
-            if(!joinred) teamshotcolor = isteam(owner->team, player1->team) ? 0x2222FF : 0XFF2222;
-            else teamshotcolor = isteam(owner->team, player1->team) ? 0XFF2222 : 0x2222FF;
+            if(!joinred) teamsmokecolor = isteam(owner->team, player1->team) ? 0x2222FF : 0XFF2222;
+            else teamsmokecolor = isteam(owner->team, player1->team) ? 0XFF2222 : 0x2222FF;
         }
-        particle_splash(PART_SMOKE, 5, 2500, v, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), 12.0f, 50, 500);
+        particle_splash(PART_SMOKE, 5, 2500, v, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 12.0f, 50, 500);
         particle_splash(PART_SPARK, 200, 300, v, 0xB49B4B, 0.24f);
         playsound(gun!=GUN_GL ? S_RLHIT : S_FEXPLODE, &v);
         particle_fireball(v, guns[gun].exprad, gun!=GUN_GL ? PART_EXPLOSION : PART_EXPLOSION_BLUE, gun!=GUN_GL ? -1 : int((guns[gun].exprad-4.0f)*15), gun!=GUN_GL ? 0xFF8080 : 0x80FFFF, 4.0f);
@@ -489,7 +524,6 @@ namespace game
         {
             particle_splash(PART_SPARK, 100, 200, v, 0xB49B4B, 0.24f);
             playsound(S_FEXPLODE, &v);
-            // no push?
         }
         else
         {
@@ -565,12 +599,12 @@ namespace game
             hits.setsize(0);
 
             // Start: Fanatic Edition
-            int teamshotcolor;
-            if(!m_teammode) teamshotcolor = 0x32FF64;
+            int teamsmokecolor;
+            if(!m_teammode) teamsmokecolor = 0x32FF64;
             else
             {
-                if(!joinred) teamshotcolor = isteam(p.owner->team, player1->team) ? 0x2222FF : 0XFF2222;
-                else teamshotcolor = isteam(p.owner->team, player1->team) ? 0XFF2222 : 0x2222FF;
+                if(!joinred) teamsmokecolor = isteam(p.owner->team, player1->team) ? 0x2222FF : 0XFF2222;
+                else teamsmokecolor = isteam(p.owner->team, player1->team) ? 0XFF2222 : 0x2222FF;
             }
             // End: Fanatic Edition
 
@@ -589,7 +623,7 @@ namespace game
             {
                 if(dist<4)
                 {
-                    if(p.o!=p.to) // if original target was moving, reevaluate endpoint
+                    if(p.o!=p.to)
                     {
                         if(raycubepos(p.o, p.dir, p.to, 0, RAY_CLIPMAT|RAY_ALPHAPOLY)>=4) continue;
                     }
@@ -603,7 +637,6 @@ namespace game
                     pos.add(vec(p.offset).mul(p.offsetmillis/float(OFFSETMILLIS)));
                     if(guns[p.gun].part)
                     {
-                         regular_particle_splash(PART_SMOKE, 2, 300, pos, 0x404040, 0.6f, 150, -20);
                          int color = 0xFFFFFF;
                          switch(guns[p.gun].part)
                          {
@@ -612,18 +645,10 @@ namespace game
                          particle_splash(guns[p.gun].part, 1, 1, pos, color, 4.8f, 150, 20);
                     }
                     // Start: Fanatic Edition
-                    else regular_particle_splash(PART_SMOKE, 2, 400, pos, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), 2.4f, 50, -20);
+                    else regular_particle_splash(PART_SMOKE, 2, 400, pos, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 2.4f, 50, -20);
                     if(lookupmaterial(pos) == MAT_WATER) regular_particle_splash(PART_BUBBLE, 4, 500, pos, 0xFFFFFF, 0.5f, 25, 500);
-                    else
-                    {
-                        particle_flare(pos, pos, 1, PART_MUZZLE_FLASH3, 0xFFFFFF, 1.0f + rndscale(5), NULL);
-                        regular_particle_splash(PART_FLAME1, 2, 50, pos, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : 0xFFFFFF), 1.2f, 25, 500);
-                        regular_particle_splash(PART_FLAME1, 2, 80, pos, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : 0xFFFFFF), 1.2f, 25, 500);
-                        regular_particle_splash(PART_FLAME2, 2, 140, pos, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : 0xFFFFFF), 1.2f, 25, 500);
-                        regular_particle_splash(PART_FLAME3, 1, 200, pos, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : 0xFFFFFF), 0.8f, 50, 500);
-                        regular_particle_splash(PART_FLAME4, 1, 260, pos, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : 0xFFFFFF), 0.8f, 50, 500);
-                    }
-                    p.pc = playsound(S_ROCKET, &pos, NULL, NULL, NULL, 128, p.pc);
+                    else particle_flare(pos, pos, 1, PART_MUZZLE_FLASH3, 0xFFFFFF, 1.0f + rndscale(5), NULL);
+                    p.pc = playsound(S_ROCKET, &pos, NULL, 0, 0, 0, p.pc, 0, 3000); 
                     // End: Fanatic Edition
                 }
             }
@@ -690,12 +715,12 @@ namespace game
     {
         int sound = guns[gun].sound, pspeed = 25;
 
-        int teamshotcolor;
-        if(!m_teammode) teamshotcolor = 0x32FF64;
+        int teamsmokecolor;
+        if(!m_teammode) teamsmokecolor = 0x32FF64;
         else
         {
-            if(!joinred) teamshotcolor = isteam(d->team, player1->team) ? 0x2222FF : 0XFF2222;
-            else teamshotcolor = isteam(d->team, player1->team) ? 0XFF2222 : 0x2222FF;
+            if(!joinred) teamsmokecolor = isteam(d->team, player1->team) ? 0x2222FF : 0XFF2222;
+            else teamsmokecolor = isteam(d->team, player1->team) ? 0XFF2222 : 0x2222FF;
         }
 
         switch(gun)
@@ -709,15 +734,14 @@ namespace game
                 if(!local) createrays(gun, from, to);
                 if(muzzleflash && d->muzzle.x >= 0)
                 {
-                    particle_splash(PART_SMOKE, 3, 500, d->muzzle, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), 1.4f, 50, 501);
+                    particle_splash(PART_SMOKE, 3, 500, d->muzzle, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 1.4f, 50, 501);
                     particle_flare(d->muzzle, d->muzzle, 200, PART_MUZZLE_FLASH3, 0xFFFFFF, 2.75f, d);
                 }
                 loopi(guns[gun].rays)
                 {
                     if(d!=hudplayer()) sound_nearmiss(S_NEARMISS1+rnd(3), from, rays[i], true);
                     if(shotsparks) particle_splash(PART_SPARK, 20, 250, rays[i], 0xB49B4B, 0.24f);
-                    particle_flare(hudgunorigin(gun, from, rays[i], d), rays[i], 250, PART_STREAK, 0xFF5500, 0.28f);
-                    particle_flare(hudgunorigin(gun, from, rays[i], d), rays[i], 100, PART_STREAK, 0xFFC864, 0.28f);
+                    particle_flare(hudgunorigin(gun, from, rays[i], d), rays[i], sgshotduration, PART_STREAK, sgshotcolor, sgshotsize);
                     if(lookupmaterial(rays[i]) == MAT_WATER) regular_particle_splash(PART_BUBBLE, 1, 500, rays[i], 0xFFFFFF, 1.0f, 25, 500); // Fanatic Edition
                     if(!local) adddecal(DECAL_BULLET, rays[i], vec(from).sub(rays[i]).normalize(), 2.0f);
                 }
@@ -726,13 +750,13 @@ namespace game
             }
 
             case GUN_CG:
-                particle_flare(hudgunorigin(gun, from, to, d), to, 250, PART_STREAK, 0xFF5500, 0.45f);
-                particle_splash(PART_SMOKE, 3, 500, d->muzzle, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), 1.4f, 50, 501);
+                particle_flare(hudgunorigin(gun, from, to, d), to, cgshotduration, PART_STREAK, cgshotcolor, cgshotsize);
+                particle_splash(PART_SMOKE, 3, 500, d->muzzle, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 1.4f, 50, 501);
             case GUN_PISTOL:
             {
                 if(d!=hudplayer()) sound_nearmiss(S_NEARMISS1+rnd(3), from, to);
                 if(shotsparks) particle_splash(PART_SPARK, 200, 250, to, 0xB49B4B, 0.24f);
-                particle_flare(hudgunorigin(gun, from, to, d), to, 200, PART_STREAK, 0xFFC864, 0.28f);
+                particle_flare(hudgunorigin(gun, from, to, d), to, pishotduration, PART_STREAK, pishotcolor, pishotsize);
                 if(lookupmaterial(hudgunorigin(gun, from, to, d)) == MAT_WATER) regular_particle_splash(PART_BUBBLE, 1, 500, hudgunorigin(gun, from, to, d), 0xFFFFFF, 1.0f, 25, 500); // Fanatic Edition
                 if(muzzleflash && d->muzzle.x >= 0)
                     particle_flare(d->muzzle, d->muzzle, gun==GUN_CG ? 100 : 200, PART_MUZZLE_FLASH1, 0xFFFFFF, gun==GUN_CG ? 2.25f : 1.25f, d);
@@ -742,11 +766,7 @@ namespace game
             }
 
             case GUN_RL:
-                if(muzzleflash && d->muzzle.x >= 0) // Fanatic Edition
-                {
-                    particle_flare(d->muzzle, d->muzzle, 250, PART_MUZZLE_FLASH2, 0xFFFFFF, 3.0f, d);
-                    regular_particle_splash(PART_SMOKE, 1, 350, d->o, 0, 2.4f, 50, -20);
-                }
+                if(muzzleflash && d->muzzle.x >= 0) particle_flare(d->muzzle, d->muzzle, 250, PART_MUZZLE_FLASH2, 0xFFFFFF, 3.0f, d);
                 if(muzzlelight) adddynlight(d->o, 30, vec(1.0f, 1.0f, 0.5f), 500, 100, DL_FLASH, 0, vec(0, 0, 0), d);
 
             case GUN_FIREBALL:
@@ -769,23 +789,32 @@ namespace game
             }
 
             case GUN_RIFLE:
-            // Start: Fanatic Edition
+                // Start: Fanatic Edition
                 if(d != hudplayer()) sound_nearmiss(S_NEARMISS1+rnd(3), from, to);
                 if(shotsparks) particle_splash(PART_SPARK, 200, 250, to, 0xB49B4B, 0.24f);
-                if(shotpart == 1) particle_flare(hudgunorigin(gun, from, to, d), to, shotduration, PART_STREAK, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), shotwidth); // laser;
-                if(shotpart == 2) particle_flare(hudgunorigin(gun, from, to, d), to, shotduration, PART_LIGHTNING, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), shotwidth); // lightning;
-                if(shotpart == 3)
+                if(ritraillaser)
                 {
-                    particle_trail(PART_SMOKE, shotduration, hudgunorigin(gun, from, to, d), to, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), shotwidth, shotgravity); // smoke;
-                    particle_flare(hudgunorigin(gun, from, to, d), to, 300, PART_STREAK, 0xFF5500, 0.4f);
+                    particle_flare(hudgunorigin(gun, from, to, d), to, 1500, PART_STREAK, lasercolorrainbow ? rnd(16777216) : (lasercolorteam ? teamsmokecolor : lasercolor), 0.6);
                 }
-                if(shotpart == 4) particle_trail_spin(PART_SPARK, shotduration, hudgunorigin(gun, from, to, d), to, shotcolorrainbow ? rnd(16777216) : (shotcolorteam ? teamshotcolor : shotcolor), shotwidth, 0, 2.8, 0.1f); // spin;
+                if(ritraillightning)
+                {
+                    particle_flare(hudgunorigin(gun, from, to, d), to, 500, PART_LIGHTNING, lightningcolorrainbow ? rnd(16777216) : (lightningcolorteam ? teamsmokecolor : lightningcolor), 0.6);
+                }
+                if(ritrailsmoke)
+                {
+                    particle_trail(PART_SMOKE, rishotduration, hudgunorigin(gun, from, to, d), to, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), rishotsize, rishotgravity);
+                    particle_flare(hudgunorigin(gun, from, to, d), to, 300, PART_STREAK, 0xFF5500, 0.24f);
+                }
+                if(ritrailspin)
+                {
+                    particle_trail_spin(PART_SPARK, 500, hudgunorigin(gun, from, to, d), to, spincolorrainbow ? rnd(16777216) : (spincolorteam ? teamsmokecolor : spincolor), 0.2, 0, 2.8, 0.1f);
+                }
                 if(lookupmaterial(hudgunorigin(gun, from, to, d)) == MAT_WATER) regular_particle_splash(PART_BUBBLE, 1, 500, hudgunorigin(gun, from, to, d), 0xFFFFFF, 1.0f, 25, 500);
                 if(muzzleflash && d->muzzle.x >= 0) particle_flare(d->muzzle, d->muzzle, 150, PART_MUZZLE_FLASH3, 0xFFFFFF, 1.25f, d);
                 if(muzzlelight) adddynlight(hudgunorigin(gun, d->o, to, d), 25, vec(0.5f, 0.375f, 0.25f), 75, 75, DL_FLASH, 0, vec(0, 0, 0), d);
                 if(!local) adddecal(DECAL_BULLET, to, vec(from).sub(to).normalize(), 3.0f);
                 break;
-            // End: Fanatic Edition
+                // End: Fanatic Edition
         }
 
         bool looped = false;

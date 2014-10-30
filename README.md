@@ -73,22 +73,10 @@
 <sub>*»sYNDABC by sYNDERF« - Directory: tf_synderf_syndabc/*</sub><br />
 <sub>*»Tiny Font by SomeDude« - Directory: tf_somedude_tiny_font/*</sub><br />
 
-#####₪ Commands: >
+#####₪ Commands: Main
 
 <sub>`abort` Use this for proper crashing FanEd without saving changes to config files;</sub><br />
 <sub>`anticheat 0|1` Enable or disable the anticheat detection system;</sub><br />
-<sub>`codepad` Helper for CubeScript/Lua ingame scripting;</sub><br />
-<sub>`date %FORMAT` Returns the current date/time in given format; example: `echo (date %Y-%m-%d %H:%M:%S)`;</sub><br />
-<sub>`getconline` Get the last console output; for specific words use `(at $getconline iNT)`;</sub><br />
-<sub>`getbuildname` Returns "Cube 2: Sauerbraten - Fanatic Edition";</sub><br />
-<sub>`getbuildrevision` Returns the current Cube 2: Sauerbraten SVN revision Fanatic Edition is based on;</sub><br />
-<sub>`getbuildurl` Returns Fanatic Edition's current github URL;</sub><br />
-<sub>`getbuildversion` Returns Fanatic Edition's current build version;</sub><br />
-<sub>`showbuildversion 0|1` Enable or disable Fanatic Edition's build version in main menu;</sub><br />
-<sub>`system STR` Runs any system command ingame and returns exit/error informations;</sub><br />
-
-#####₪ Commands: Customizing
-
 <sub>`autorespawn 0|1`</sub><br />
 <sub>`autosaydisconnect 0|1`</sub><br />
 <sub>`autosaydisconnectmsg "STR"`</sub><br />
@@ -111,24 +99,34 @@
 <sub>`centerconsole 0|1`</sub><br />
 <sub>`centerconsolealpha 0-255`</sub><br />
 <sub>`centerconsoledelay 0-10000`</sub><br />
+<sub>`cgshotcolor RGB|HEX`</sub><br />
+<sub>`cgshotduration iNT`</sub><br />
+<sub>`cgshotsize FLOAT`</sub><br />
+<sub>`codepad` Helper for CubeScript/Lua ingame scripting;</sub><br />
 <sub>`compass 0|1`</sub><br />
 <sub>`confix iNT` Set fixed width for console lines;</sub><br />
 <sub>`consmoothfade 0|1` Enable or disable smooth console fading;</sub><br />
 <sub>`contimestamp 0|1|2` Enable or disable console time, 1: *fullconsole*, 2: *always*;</sub><br />
-<sub>`crouch` Bind it to a key for experimental crouching (Note: Other players will **not** see you crouched.);</sub><br />
 <sub>`crosshairalpha 0.0f-1.1f`</sub><br />
 <sub>`crosshairbumpfx 0|1` Enable or disable the crosshair bump effect;</sub><br />
 <sub>`crosshaircolor RGB|HEX` Change the color of your crosshair;</sub><br />
 <sub>`crosshairnames 0|1` Enable or disable drawing info text next to the crosshair (player->name);</sub><br />
 <sub>`crosshairnamesalpha 0-255`</sub><br />
-<sub>`crosshairnamesdelay 0-10000`</sub><br />
 <sub>`crosshairnamescolor 0-9-A-Z`</sub><br />
+<sub>`crosshairnamesdelay 0-10000`</sub><br />
+<sub>`crouch` Bind it to a key for experimental crouching (Note: Other players will **not** see you crouched.);</sub><br />
 <sub>`ctfsoundset "STR"` Set the desired soundset for ctf modes;</sub><br />
 <sub>`damagemotion 0|1` Enable or disable special effects after getting damage from explosives;</sub><br />
 <sub>`damageparticle 0|1` Enable or disable the damage information particle above players heads;</sub><br />
+<sub>`date %FORMAT` Returns the current date/time in given format; example: `echo (date %Y-%m-%d %H:%M:%S)`;</sub><br />
 <sub>`deathcamera 0|1` Enable or disable experimental actor following after death (Note: Other players will **not** see you spectating.);</sub><br />
-<sub>`deathpanicsound 0|1` Enable or disable the deathpanic heartbeat sound;</sub><br />
 <sub>`deathpanicscreen 0|1` Enable or disable the deathpanic eyeveins screen;</sub><br />
+<sub>`deathpanicsound 0|1` Enable or disable the deathpanic heartbeat sound;</sub><br />
+<sub>`getbuildname` Returns "Cube 2: Sauerbraten - Fanatic Edition";</sub><br />
+<sub>`getbuildrevision` Returns the current Cube 2: Sauerbraten SVN revision Fanatic Edition is based on;</sub><br />
+<sub>`getbuildurl` Returns Fanatic Edition's current github URL;</sub><br />
+<sub>`getbuildversion` Returns Fanatic Edition's current build version;</sub><br />
+<sub>`getconline` Get the last console output; for specific words use `(at $getconline iNT)`;</sub><br />
 <sub>`guialpha 0-255`</sub><br />
 <sub>`guncolorfrags 0|1` Enable or disabled weapon related (colored) frag messages;</sub><br />
 <sub>`highlight "STR"` Highlight STR (play highlight sound), default: *player1->name*;</sub><br />
@@ -136,28 +134,52 @@
 <sub>`hudminiscoreboard 0|1` Show a small mini scoreboard at the right side of the hud;</sub><br />
 <sub>`hudminiscoreboardalpha 0-255`</sub><br />
 <sub>`hudminiscoreboardcolor 0-9-A-Z`</sub><br />
-<sub>`hudminiscoreboardlimit iNT` Limit the players shown at the mini scoreboard;</sub><br />
 <sub>`hudminiscoreboardlimitcmode iNT` Limit the players shown at the mini scoreboard in ctf/collect mode (with radar);</sub><br />
+<sub>`hudminiscoreboardlimit iNT` Limit the players shown at the mini scoreboard;</sub><br />
 <sub>`hudstats 0|1`</sub><br />
 <sub>`hudstatsalpha 0-255`</sub><br />
 <sub>`hudstatscolor 0-9-A-Z`</sub><br />
+<sub>`lasercolorrainbow 0|1`</sub><br />
+<sub>`lasercolor RGB|HEX`</sub><br />
+<sub>`lasercolorteam 0|1`</sub><br />
+<sub>`lightningcolorrainbow 0|1`</sub><br />
+<sub>`lightningcolor RGB|HEX`</sub><br />
+<sub>`lightningcolorteam 0|1`</sub><br />
+<sub>`pishotcolor RGB|HEX`</sub><br />
+<sub>`pishotduration iNT`</sub><br />
+<sub>`pishotsize FLOAT`</sub><br />
 <sub>`playchatsound 0|1`</sub><br />
 <sub>`playnearmisssound 0|1`</sub><br />
 <sub>`playrespawnsound 0|1`</sub><br />
 <sub>`positionpacketdelay 0-33` Less values are smoothing network lags;</sub><br />
+<sub>`radar STR` Set custom radar texture;</sub><br />
 <sub>`radarteammatesdead 0|1` Enable or disable radar icons for dead players (own team);</sub><br />
 <sub>`radarteammatesplayerstarts 0|1` Enable or disable radar icons for playerstarts (own team);</sub><br />
-<sub>`radar STR` Set custom radar texture;</sub><br />
+<sub>`riflareduration iNT`</sub><br />
+<sub>`riflaresize FLOAT`</sub><br />
+<sub>`riiflarecolor RGB|HEX`</sub><br />
+<sub>`rishotduration iNT`</sub><br />
+<sub>`rishotgravity iNT`</sub><br />
+<sub>`rishotsize FLOAT`</sub><br />
+<sub>`ritraillaser 0|1`</sub><br />
+<sub>`ritraillightning 0|1`</sub><br />
+<sub>`ritrailsmoke 0|1`</sub><br />
+<sub>`ritrailspin 0|1`</sub><br />
 <sub>`serverlistmax iNT` Set amount of servers shown at one server list page;</sub><br />
 <sub>`setfont FONT` Hook for dynamic font changing; myFont.cfg needs to be executed before: (`exec packages/fonts/myFont.cfg`);</sub><br />
-<sub>`shotcolor RGB|HEX` Set custom weapons smoke colors;</sub><br />
-<sub>`shotcolorrainbow 0|1` Set custom weapons smoke colors randomly colored;</sub><br />
-<sub>`shotduration FLOAT` Set custom shotduration of smoke (rifle);</sub><br />
-<sub>`shotgravity FLOAT` Set custom shotgravity of smoke (rifle);</sub><br />
-<sub>`shotpart 0|1|2|3|4` Set the trail particle for your rifle: 0: *nothing*, 1: *laser*, 2: *lightning*, 3: *smoke*, 4: *spin (aka railgun)*;</sub><br />
-<sub>`shotsparks 0|1` Enable or disable shotsparks (chaingun, pistol, rifle);</sub><br />
-<sub>`shotwidth FLOAT` Set custom shotwidth of smoke (rifle);</sub><br />
+<sub>`sgshotcolor RGB|HEX`</sub><br />
+<sub>`sgshotduration iNT`</sub><br />
+<sub>`sgshotsize FLOAT`</sub><br />
+<sub>`shotsparks 0|1`</sub><br />
+<sub>`showbuildversion 0|1` Enable or disable Fanatic Edition's build version in main menu;</sub><br />
 <sub>`showtimeremaining 0|1` Show remaining time at upper right corner/below minimap;</sub><br />
+<sub>`smokecolorrainbow 0|1`</sub><br />
+<sub>`smokecolor RGB|HEX`</sub><br />
+<sub>`smokecolorteam 0|1`</sub><br />
+<sub>`spincolorrainbow 0|1`</sub><br />
+<sub>`spincolor RGB|HEX`</sub><br />
+<sub>`spincolorteam 0|1`</sub><br />
+<sub>`system STR` Runs any system command ingame and returns exit/error informations;</sub><br />
 <sub>`teamblue` Join the blue team;</sub><br />
 <sub>`teamred` Join the red team;</sub><br />
 <sub>`thirdpersonalpha 0-100`</sub><br />

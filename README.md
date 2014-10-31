@@ -5,7 +5,7 @@
 #####₪ Features
 
 <sub>★ Ingame IRC</sub><br />
-<sub>★ Lua support</sub><br />
+<sub>★ Lua scripting</sub><br />
 <sub>★ Image importing</sub><br />
 <sub>★ Object importing</sub><br />
 <sub>★ Ingame file sharing</sub><br />
@@ -157,7 +157,7 @@
 <sub>`radarteammatesplayerstarts 0|1` Enable or disable radar icons for playerstarts (own team);</sub><br />
 <sub>`riflareduration iNT`</sub><br />
 <sub>`riflaresize FLOAT`</sub><br />
-<sub>`riiflarecolor RGB|HEX`</sub><br />
+<sub>`riflarecolor RGB|HEX`</sub><br />
 <sub>`rishotduration iNT`</sub><br />
 <sub>`rishotgravity iNT`</sub><br />
 <sub>`rishotsize FLOAT`</sub><br />
@@ -375,7 +375,7 @@
 
 <sub>> Note: You can edit .lua files on the fly; just run `resetlua` after your edits to update;</sub><br />
 
-<sub>> Implemented C++ hooks for Lua Scriping:</sub><br />
+<sub>> Implemented C++ hooks for Lua usage:</sub><br />
 
 <sub>`sauer()`</sub><br />
 <sub>`sauer_build()`</sub><br />

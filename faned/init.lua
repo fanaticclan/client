@@ -49,7 +49,7 @@ function calc(expression)
     sauer("echo \f9FanEd\f7::LuaJIT: Result: " .. fc() .. ".")
 end
 
-function dec_to_hex(a)
+function dectohex(a)
     local b, i = {},0
     while i < 8 do
         i = i+1
@@ -59,21 +59,7 @@ function dec_to_hex(a)
     return b
 end
 
-function detectviewtex(cn)
-    Cpi = math.pi/180
-    pitch = sauer_getplayerinfo(cn, 4)*Cpi; yaw = (sauer_getplayerinfo(cn, 5)+90.0)*Cpi;
-    vx = math.cos(pitch)*math.cos(yaw); vy = math.cos(pitch)*math.sin(yaw); vz = math.sin(pitch);
-    return sauer_getcubeinfo(cn,vx,vy,vz,0,5)
-end
-
-function detectdistdata(cn)
-    Cpi = math.pi/180
-    pitch = sauer_getplayerinfo(cn, 4)*Cpi; yaw = (sauer_getplayerinfo(cn, 5)+90.0)*Cpi;
-    vx = math.cos(pitch)*math.cos(yaw); vy = math.cos(pitch)*math.sin(yaw); vz = math.sin(pitch);
-    return sauer_getcubeinfo(cn,vx,vy,vz,0,-2),sauer_getcubeinfo(cn,vx,vy,vz,0,5)
-end
-
-function gettarget()
+function detectcube()
     Cpi = math.pi/180.;
     mycn = sauer("getclientnum");  
     pitch = sauer_getplayerinfo(mycn, 4)*Cpi;
@@ -85,6 +71,20 @@ function gettarget()
     sauer_echo(sauer_getcubeinfo(mycn,vx,vy,vz,0,5))
     tex = sauer_getcubeinfo(mycn,0,0,-1,0,2)
     sauer_echo(tex)
+end
+
+function detectdist(cn)
+    Cpi = math.pi/180
+    pitch = sauer_getplayerinfo(cn, 4)*Cpi; yaw = (sauer_getplayerinfo(cn, 5)+90.0)*Cpi;
+    vx = math.cos(pitch)*math.cos(yaw); vy = math.cos(pitch)*math.sin(yaw); vz = math.sin(pitch);
+    return sauer_getcubeinfo(cn,vx,vy,vz,0,-2),sauer_getcubeinfo(cn,vx,vy,vz,0,5)
+end
+
+function detecttex(cn)
+    Cpi = math.pi/180
+    pitch = sauer_getplayerinfo(cn, 4)*Cpi; yaw = (sauer_getplayerinfo(cn, 5)+90.0)*Cpi;
+    vx = math.cos(pitch)*math.cos(yaw); vy = math.cos(pitch)*math.sin(yaw); vz = math.sin(pitch);
+    return sauer_getcubeinfo(cn,vx,vy,vz,0,5)
 end
 
 function pitchyawfromvec(a)
@@ -114,17 +114,17 @@ function tigerhash(text)
     return sauer_hashstring(text, 49)
 end
 
-function vec_len(a)
+function veclen(a)
     return math.sqrt(a[1]^2+a[2]^2+a[3]^2)
 end
 
-function vec_norm(a)
+function vecnorm(a)
     s = math.sqrt(a[1]^2+a[2]^2+a[3]^2);
     if s == 0 then s = 1 end
     for i = 1,3 do a[i] = a[i] / s end
 end
 
-function vec_sub(a,b,c)
+function vecsub(a,b,c)
     if a[1] == nil then return end
     for i = 1,3 do c[i] = a[i]-b[i] end
 end

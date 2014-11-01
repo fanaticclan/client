@@ -53,7 +53,7 @@
 
 <sub>**Filesystem**: Fanatic Edition is made to run next to your vanilla Sauerbraten SVN client and not to interfer with its file system; if you want to use your personal auth.cfg or autoexec.cfg with Fanatic Edition, you need to rename them to *faned_auth.cfg* / *faned_autoexec.cfg*, otherwise Fanatic Edition will ignore these files.</sub>
 
-<sub>**Importing Images**: With Fanatic Edition, you can easy import image files to your map using LUA. Place *myimage.png* into your sauerbraten main directory, ingame enter the following command: `lua buildimagevcolor('myImage.png',100,100)` and wait till the converting process is finished. The full function's syntax is  `buildimagevcolor('FiLE',WiDTH,HEIGHT,R,G,B,ALPHA)`.</sub>
+<sub>**Importing Images**: With Fanatic Edition, you can easy import image files to your map using LUA. Place *myimage.png* into your sauerbraten main directory, ingame enter the following command: `lua importimagevcolor('myImage.png',100,100)` and wait till the converting process is finished. The full function's syntax is  `importimagevcolor('FiLE',WiDTH,HEIGHT,R,G,B,ALPHA)`.</sub>
 
 <sub>**Importing Objects**: To use the blender importer, first install [Wrack's SMC Exporter](https://github.com/wrack/blender-smc-exporter) *io_export_smc.py*, located at *faned/tools/* into Blender: *File > User Preferences > Addons > Install Addon* and don't forget to activate it. Now create some geometry, select it, hit *File > Export > Sauerbraten (.smc)*, set desired grid and cubecount values (grid 0 and cubecount 50 are good values for testing) and back at Fanatic Edition, simply enter `importsmc PATH/FiLE.smc`. This will load the .smc (Sauerbraten Marching Cubes) file to your current selection.</sub>
 
@@ -370,20 +370,6 @@
 <sub>`ircrelaychan`</sub><br />
 <sub>`ircsay`</sub><br />
 <sub>`ircserv`</sub><br />
-
-#####₪ Commands: Lua
-
-<sub>> Note: You can run Lua commands directly; just run `lua COMMAND` to execute;</sub><br />
-
-<sub>`lua texavggen()` Build Image (Texture Mode) Step 1; Generate "color palette" based on packages/* textures;</sub><br />
-<sub>`lua texavgload()` Build Image (Texture Mode) Step 2; Load the generated "color palette";</sub><br />
-<sub>`lua buildimagetexture('myImage.png',WiDTH,HEiGHT)` Build Image (Texture Mode, needs generated "color palette" before usage);</sub><br />
-<sub>`lua buildimagevcolor('myImage.png',WiDTH,HEiGHT)` Build Image (vColor Mode);</sub><br />
-<sub>`lua settypewriterchars()` Typwriting Step 1: Select font in order: abcdefghijklmnopqrstuvwxyz0123456789;</sub><br />
-<sub>`lua settypewriterprint()` Typwriting Step 2, Select output area for printing;</sub><br />
-<sub>`lua "typewriter(^"some text^")";` Typwriting Step 3, Go anywhere, select a cube and enter some text to print;</sub><br />
-
-<sub>> Note: You can edit .lua files on the fly; just run `resetlua` after your edits to update;</sub><br />
 
 #####₪ Commands: Physics
 

@@ -1,6 +1,6 @@
--- Fanatic Edition: buildimage.lua
--- buildimagetextureture by AC
--- buildimagevcolor by bum
+-- Fanatic Edition: importimage.lua
+-- importimagetexture by AC
+-- importimagevcolor by bum
 
 function texavggen()
     local width, height, l, filename = 100, 100
@@ -87,7 +87,7 @@ function buildimagetexture(filename, w, h)
     sauer("recalc")
 end
 
-function buildimagevcolor(filename, w, h, sr, sg, sb, sa)
+function importimagevcolor(filename, w, h, sr, sg, sb, sa)
     local ox, oy, oz, grid, orient = sauer_getsel(0, 1, 2, 6, 11)
     local all = sauer("$allfaces")
     if all == 1 then orient = -1 end

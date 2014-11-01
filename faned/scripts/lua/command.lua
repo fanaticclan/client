@@ -1,4 +1,4 @@
--- Fanatic Edition: cmd.lua
+-- Fanatic Edition: command.lua
 
 --[[
 

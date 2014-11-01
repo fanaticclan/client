@@ -69,7 +69,7 @@ function match_tex(R, G, B)
     return j
 end
 
-function buildimagetexture(filename, w, h)
+function importimagetexture(filename, w, h)
     local ox, oy, oz, grid = sauer_getsel(0, 1, 2, 6)
     local k, index = 0, 0
     pixels = sauer_loadimage(filename, w, h)

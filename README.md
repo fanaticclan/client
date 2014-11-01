@@ -373,27 +373,6 @@
 
 #####₪ Commands: Lua
 
-<sub>> Note: You can edit .lua files on the fly; just run `resetlua` after your edits to update;</sub><br />
-
-<sub>> Implemented C++ hooks for Lua usage:</sub><br />
-
-<sub>`sauer()`</sub><br />
-<sub>`sauer_build()`</sub><br />
-<sub>`sauer_copy()`</sub><br />
-<sub>`sauer_paste()`</sub><br />
-<sub>`sauer_editface()`</sub><br />
-<sub>`sauer_edittex()`</sub><br />
-<sub>`sauer_editent()`</sub><br />
-<sub>`sauer_getcubeinfo()`</sub><br />
-<sub>`sauer_getsel()`</sub><br />
-<sub>`sauer_setsel()`</sub><br />
-<sub>`sauer_vcolor()`</sub><br />
-<sub>`sauer_hashstring()`</sub><br />
-<sub>`sauer_loadimage()`</sub><br />
-<sub>`sauer_lookupcube()`</sub><br />
-<sub>`sauer_getplayerinfo()`</sub><br />
-<sub>`sauer_setplayerinfo()`</sub><br />
-
 <sub>> Note: You can run Lua commands directly; just run `lua COMMAND` to execute;</sub><br />
 
 <sub>`lua texavggen()` Build Image (Texture Mode) Step 1; Generate "color palette" based on packages/* textures;</sub><br />
@@ -403,6 +382,8 @@
 <sub>`lua settypewriterchars()` Typwriting Step 1: Select font in order: abcdefghijklmnopqrstuvwxyz0123456789;</sub><br />
 <sub>`lua settypewriterprint()` Typwriting Step 2, Select output area for printing;</sub><br />
 <sub>`lua "typewriter(^"some text^")";` Typwriting Step 3, Go anywhere, select a cube and enter some text to print;</sub><br />
+
+<sub>> Note: You can edit .lua files on the fly; just run `resetlua` after your edits to update;</sub><br />
 
 #####₪ Commands: Physics
 

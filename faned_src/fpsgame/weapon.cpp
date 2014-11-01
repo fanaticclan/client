@@ -629,7 +629,7 @@ namespace game
                     }
                     projsplash(p, v, NULL, qdam);
                     exploded = true;
-                    stopsound(S_ROCKET, p.pc); // Fanatic Edition
+                    stopsound(S_ROCKET, p.pc, 1000); // Fanatic Edition
                 }
                 else
                 {
@@ -648,7 +648,7 @@ namespace game
                     else regular_particle_splash(PART_SMOKE, 2, 400, pos, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 2.4f, 50, -20);
                     if(lookupmaterial(pos) == MAT_WATER) regular_particle_splash(PART_BUBBLE, 4, 500, pos, 0xFFFFFF, 0.5f, 25, 500);
                     else particle_flare(pos, pos, 1, PART_MUZZLE_FLASH3, 0xFFFFFF, 1.0f + rndscale(5), NULL);
-                    p.pc = playsound(S_ROCKET, &pos, NULL, 0, 0, 0, p.pc, 0, 3000); 
+                    p.pc = playsound(S_ROCKET, &pos, NULL, 0, 0, 0, p.pc); 
                     // End: Fanatic Edition
                 }
             }

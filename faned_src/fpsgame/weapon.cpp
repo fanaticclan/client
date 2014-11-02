@@ -6,19 +6,19 @@ VARP(blood, 0, 1, 1);
 HVARP(bloodcolor, 0, 0x9F0000, 0xFFFFFF);
 FVARP(bloodintensity, 0, 5.0f, INT_MAX);
 
-HVARP(sgshotcolor, 0, 0xFF7700, 0xFFFFFF);
+HVARP(sgshotcolor, 0, 0xFF6600, 0xFFFFFF);
 VARP(sgshotduration, 1, 100, 10000);
 FVARP(sgshotsize, 0, 0.24f, 50.0f);
 
-HVARP(cgshotcolor, 0, 0xFF7700, 0xFFFFFF);
+HVARP(cgshotcolor, 0, 0xFF6600, 0xFFFFFF);
 VARP(cgshotduration, 1, 250, 10000);
 FVARP(cgshotsize, 0, 0.24f, 50.0f);
 
-HVARP(pishotcolor, 0, 0xFF7700, 0xFFFFFF);
+HVARP(pishotcolor, 0, 0xFF6600, 0xFFFFFF);
 VARP(pishotduration, 1, 250, 10000);
 FVARP(pishotsize, 0, 0.24f, 50.0f);
 
-HVARP(riflarecolor, 0, 0xFF7700, 0xFFFFFF);
+HVARP(riflarecolor, 0, 0xFF6600, 0xFFFFFF);
 VARP(riflareduration, 1, 250, 10000);
 FVARP(riflaresize, 0, 0.24f, 50.0f);
 
@@ -629,7 +629,6 @@ namespace game
                     }
                     projsplash(p, v, NULL, qdam);
                     exploded = true;
-                    stopsound(S_ROCKET, p.pc, 1000); // Fanatic Edition
                 }
                 else
                 {
@@ -648,7 +647,7 @@ namespace game
                     else regular_particle_splash(PART_SMOKE, 2, 400, pos, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 2.4f, 50, -20);
                     if(lookupmaterial(pos) == MAT_WATER) regular_particle_splash(PART_BUBBLE, 4, 500, pos, 0xFFFFFF, 0.5f, 25, 500);
                     else particle_flare(pos, pos, 1, PART_MUZZLE_FLASH3, 0xFFFFFF, 1.0f + rndscale(5), NULL);
-                    p.pc = playsound(S_ROCKET, &pos, NULL, 0, 0, 0, p.pc); 
+                    p.pc = playsound(S_ROCKET, &pos, NULL, 0, -1, 1, p.pc, -1, 3000);
                     // End: Fanatic Edition
                 }
             }
@@ -658,6 +657,7 @@ namespace game
                     addmsg(N_EXPLODE, "rci3iv", p.owner, lastmillis-maptime, p.gun, p.id-maptime,
                             hits.length(), hits.length()*sizeof(hitmsg)/sizeof(int), hits.getbuf());
                 projs.remove(i--);
+                stopsound(S_ROCKET, p.pc); // Fanatic Edition
             }
             else p.o = v;
         }

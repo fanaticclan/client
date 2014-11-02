@@ -589,6 +589,7 @@ namespace game
         }
         else if(d == actor || actor->type == ENT_INANIMATE)
         {
+            d->suicides++;
             if(d != player1) conoutf(contype, "\f2%s suicided", dname);
             else
             {
@@ -601,6 +602,7 @@ namespace game
         }
         else if(isteam(d->team, actor->team))
         {
+            actor->teamkills++;
             contype |= CON_TEAMKILL;
             if(actor == player1)
             {
@@ -664,7 +666,7 @@ namespace game
                     copystring(centerconsolemessage1, centerconsolestring);
                     if(identexists("onfragenemy")) execute("onfragenemy");
 
-                    if(d->vel.magnitude() >= 190)
+                    if(d->timeinair)
                     {
                         playsound(S_GREATSHOT);
                         greatshot = 1;
@@ -687,41 +689,7 @@ namespace game
             d->stopheartbeat();
         }
     }
-
-    VARP(autosaygg, 0, 0, 1);
-    SVARP(autosayggmsg, "gg");
     // End: Fanatic Edition
-
-    void timeupdate(int secs)
-    {
-        if(secs > 0)
-        {
-            maplimit = lastmillis + secs*1000;
-        }
-        else
-        {
-            intermission = true;
-            player1->attacking = false;
-            if(cmode) cmode->gameover();
-            conoutf(CON_GAMEINFO, "\f2intermission:");
-            conoutf(CON_GAMEINFO, "\f2game has ended!");
-            if(m_ctf) conoutf(CON_GAMEINFO, "\f2player frags: %d, flags: %d, deaths: %d", player1->frags, player1->flags, player1->deaths);
-            else if(m_collect) conoutf(CON_GAMEINFO, "\f2player frags: %d, skulls: %d, deaths: %d", player1->frags, player1->flags, player1->deaths);
-            else conoutf(CON_GAMEINFO, "\f2player frags: %d, deaths: %d", player1->frags, player1->deaths);
-            int accuracy = (player1->totaldamage*100)/max(player1->totalshots, 1);
-            conoutf(CON_GAMEINFO, "\f2player total damage dealt: %d, damage wasted: %d, accuracy(%%): %d", player1->totaldamage, player1->totalshots-player1->totaldamage, accuracy);
-            if(m_sp) spsummary(accuracy);
-
-            showscores(true);
-            disablezoom();
-            playsound(S_INTERMISSION);
-            // Start: Fanatic Edition
-            if(autosaygg) toserver(autosayggmsg);
-            if(identexists("intermission")) execute("intermission");
-            if(identexists("onintermission")) execute("onintermission");
-            // End: Fanatic Edition
-        }
-    }
 
     // Start: Fanatic Edition
     ICOMMAND(getaccuracy, "", (), intret((player1->totaldamage*100)/max(player1->totalshots, 1)));
@@ -739,6 +707,8 @@ namespace game
     ICOMMAND(getpitch, "", (), intret(player1->pitch));
     ICOMMAND(getspeed, "", (), intret(player1->vel.magnitude()));
     ICOMMAND(getstate, "", (), intret(player1->state));
+    ICOMMAND(getsuicides, "", (), intret(player1->suicides));
+    ICOMMAND(getteamkills, "", (), intret(player1->teamkills));
     ICOMMAND(gettotaldamage, "", (), intret(player1->totaldamage));
     ICOMMAND(gettotalshots, "", (), intret(player1->totalshots));
     ICOMMAND(getvelx, "", (), intret(player1->vel.x));
@@ -768,6 +738,53 @@ namespace game
         return 0;
     }
     ICOMMAND(getteamscore, "s", (const char *team), intret(getteamscore(team)));
+    // End: Fanatic Edition
+
+    // Start: Fanatic Edition
+    VARP(autosaygg, 0, 0, 1);
+    SVARP(autosayggmsg, "gg");
+
+    void timeupdate(int secs)
+    {
+        if(secs > 0)
+        {
+            maplimit = lastmillis + secs*1000;
+        }
+        else
+        {
+            intermission = true;
+            player1->attacking = false;
+            if(cmode) cmode->gameover();
+
+            disablezoom();
+            showscores(true);
+            playsound(S_INTERMISSION);
+
+            if(autosaygg) toserver(autosayggmsg);
+
+            if(identexists("intermission")) execute("intermission"); // Legacy
+            if(identexists("onintermission")) execute("onintermission");
+
+            if(m_teammode)
+            {
+                int scoregood = getteamscore("good");
+                int scoreevil = getteamscore("evil");
+                if(strcmp(player1->team, "good") == 0 && scoregood > scoreevil) playsound(S_WIN);
+                else if(strcmp(player1->team, "evil") == 0 && scoregood > scoreevil) playsound(S_LOSE);
+                else if(scoregood == scoreevil) playsound(S_TIE);
+            }
+
+            conoutf(CON_GAMEINFO, "\f2intermission:");
+            conoutf(CON_GAMEINFO, "\f2game has ended!");
+            if(m_ctf) conoutf(CON_GAMEINFO, "\f2player frags: %d, flags: %d, deaths: %d, teamkills: %d, suicides: %d", player1->frags, player1->flags, player1->deaths, player1->teamkills, player1->suicides);
+            else if(m_collect) conoutf(CON_GAMEINFO, "\f2player frags: %d, skulls: %d, deaths: %d, teamkills: %d, suicides: %d", player1->frags, player1->flags, player1->deaths, player1->teamkills, player1->suicides);
+            else if(m_teammode) conoutf(CON_GAMEINFO, "\f2player frags: %d, deaths: %d, teamkills: %d, suicides: %d", player1->frags, player1->deaths, player1->teamkills, player1->suicides);
+            else conoutf(CON_GAMEINFO, "\f2player frags: %d, deaths: %d", player1->frags, player1->deaths);
+            int accuracy = (player1->totaldamage*100)/max(player1->totalshots, 1);
+            conoutf(CON_GAMEINFO, "\f2player total damage dealt: %d, damage wasted: %d, accuracy(%%): %d", player1->totaldamage, player1->totalshots-player1->totaldamage, accuracy);
+            if(m_sp) spsummary(accuracy);
+        }
+    }
     // End: Fanatic Edition
     
     vector<fpsent *> clients;
@@ -850,6 +867,8 @@ namespace game
             d->deaths = 0;
             d->totaldamage = 0;
             d->totalshots = 0;
+            d->suicides = 0;
+            d->teamkills = 0;
             d->maxhealth = 100;
             d->lifesequence = -1;
             d->respawned = d->suicided = -2;

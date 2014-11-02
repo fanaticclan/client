@@ -2524,6 +2524,7 @@ ICOMMAND(getbuildversion, "", (), result(buildversion));
 extern int sehud;
 
 VARP(showspeed, 0, 1, 1);
+VARP(showteamscores, 0, 1, 1);
 VARP(showtimeremaining, 0, 1, 1);
 // End: Fanatic Edition
 
@@ -2661,11 +2662,23 @@ void gl_drawhud(int w, int h)
                 }
             }
 
-            if(showtimeremaining && !m_check(game::gamemode, M_EDIT) && !game::intermission && !deathcamerastate) // Fanatic Edition
+            if(!m_check(game::gamemode, M_EDIT) && !game::intermission && !deathcamerastate) // Fanatic Edition
             {
+                int scoregood = game::getteamscore("good");
+                int scoreevil = game::getteamscore("evil");
+                defformatstring(scoresgood)("%d:%d", scoregood, scoreevil);
+                defformatstring(scoresevil)("%d:%d", scoreevil, scoregood);
+
                 int val = max(game::maplimit - lastmillis, 0)/1000;
                 defformatstring(time)("%s%d:%02d", val/60 < 1 ? "\fZ-" : "\f7-", val/60, val%60);
-                draw_textf("%s", conw-(game::cmode ? (fontfix ? 5.8 : 6.5) : (fontfix ? 3 : 4))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), time);
+
+                if(m_check(game::gamemode, M_TEAM))
+                {
+                    if(showteamscores && showtimeremaining) draw_textf("%s @ %s", conw-(game::cmode ? (fontfix ? 7 : 7.7) : (fontfix ? 5.2 : 6.2))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), strcmp(game::player1->team, "good") == 0 ? scoresgood : scoresevil, time);
+                    else if(showteamscores && !showtimeremaining) draw_textf("%s", conw-(game::cmode ? (fontfix ? 5.5 : 6.2) : (fontfix ? 2.3 : 3.3))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), strcmp(game::player1->team, "good") == 0 ? scoresgood : scoresevil);
+                    else if(!showteamscores && showtimeremaining) draw_textf("%s", conw-(game::cmode ? (fontfix ? 5.8 : 6.5) : (fontfix ? 2.8 : 3.8))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), time);
+                }
+                else if(showtimeremaining) draw_textf("%s", conw-(game::cmode ? (fontfix ? 5.8 : 6.5) : (fontfix ? 2.8 : 3.8))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), time);
             }
                        
             if(editmode || showeditstats)

@@ -484,18 +484,21 @@ namespace game
             case 37: return int(d->smoothmillis);
             case 38: return int(d->state); // CS_ALIVE, CS_DEAD, CS_SPAWNING, CS_LAGGED, CS_EDITING, CS_SPECTATOR
             case 39: return int(d->suicided);
-            case 40: return int(d->tokens);
-            case 41: return int(d->totaldamage);
-            case 42: return int(d->totalshots);
-            case 43: return int(d->vel.magnitude());
-            case 44: return int(d->vel.x);
-            case 45: return int(d->vel.y);
-            case 46: return int(d->vel.z);
-            case 47: return int(d->weight);
-            case 48: return int(d->yaw);
+            case 40: return int(d->suicides);
+            case 41: return int(d->teamkills);
+            case 42: return int(d->tokens);
+            case 43: return int(d->totaldamage);
+            case 44: return int(d->totalshots);
+            case 45: return int(d->vel.magnitude());
+            case 46: return int(d->vel.x);
+            case 47: return int(d->vel.y);
+            case 48: return int(d->vel.z);
+            case 49: return int(d->weight);
+            case 50: return int(d->yaw);
         }
         return 0;
     }
+
     ICOMMAND(getclientinfo, "ii", (int *cn, int *type), intret(getclientinfo(*cn, *type)));
 
     void getclientip(int cn)
@@ -547,138 +550,18 @@ namespace game
                     IP[0] = resp[len - 3];
                     IP[1] = resp[len - 2];
                     IP[2] = resp[len - 1];
-                    defformatstring(ip)("%d.%d.%d.0", IP[0], IP[1], IP[2]);
+                    defformatstring(ip)("%d.%d.%d.*", IP[0], IP[1], IP[2]);
                     result(ip);
                     return;
             	}
             }
         }
-        result("0.0.0.0");
     }
     ICOMMAND(getclientip, "i", (int *cn), getclientip(*cn));
 
-    VARP(autowhois, 0, 0, 1);
-    VARP(autowhoisdump, 0, 0, 2);
-
-    int whoisdump(void* data)
-    {
-        int cn = (int)data;
-        fpsent *client = getclient(cn);
-        if(!client) return -1;
-        ENetSocket whoissock;
-        uchar d[3];
-        d[0] = (uchar)0x00;
-        d[1] = (uchar)0x01;
-        d[2] = (uchar)(cn);
-        ENetBuffer buf;
-        buf.data = d;
-        buf.dataLength = 3;
-        whoissock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
-        ENetAddress Server;
-        if(connectedpeer())
-        {
-            Server.host = connectedpeer()->host;
-            Server.port = connectedpeer()->port+1;
-            enet_socket_send(whoissock, &Server, &buf, 1);
-            ENetBuffer rcvbuf;
-            uchar resp[MAXTRANS];
-            rcvbuf.data = resp;
-            rcvbuf.dataLength = sizeof(resp);
-            uchar IP[3];
-            int len = enet_socket_receive(whoissock, &Server, &rcvbuf, 1);
-            if(len == 8 &&
-                resp[0] == 0 &&
-                resp[1] == 1 &&
-                resp[2] == (uchar)(cn) &&
-                resp[3] == 0xff &&
-                resp[4] == 0x69 &&
-                resp[5] == 0x00 &&
-                resp[6] == 0xf6 &&
-                resp[7] == (uchar)(cn)
-            )
-            {
-            	len = enet_socket_receive(whoissock, &Server, &rcvbuf, 1);
-            	if(len >= 21 &&
-                    resp[0] == 0 &&
-                    resp[1] == 1 &&
-                    resp[2] == (uchar)(cn) &&
-                    resp[3] == 0xff &&
-                    resp[4] == 0x69 &&
-                    resp[5] == 0x00 &&
-                    resp[6] == 0xf5 &&
-                    resp[7] == (uchar)(cn)
-                )
-            	{
-                    IP[0] = resp[len - 3];
-                    IP[1] = resp[len - 2];
-                    IP[2] = resp[len - 1];
-                    defformatstring(curip)("%d.%d.%d.*", IP[0], IP[1], IP[2]);
-
-                    stream *fr = openutf8file(path(faned_whois(), true), "r");
-                    if(!fr)
-                    {
-                        conoutf(CON_ERROR, "\f9FanEd\f7::whoisdump: \f3#error: \f7failed to open \f4%s\f7 for reading", faned_whois());
-                        playsound(S_ERROR);
-                        return 1;
-                    }
-
-                    char linebuf[30];
-                    bool found = false;
-
-                    while(fr->getline(linebuf, sizeof(linebuf)))
-                    {
-                        if(strstr(linebuf, curip) && strstr(linebuf, client->name)) found = true;
-                    }
-
-                    if(found == false)
-                    {
-                        stream *fw = openutf8file(path(faned_whois(), true), "a");
-                        if(!fw)
-                        {
-                            conoutf(CON_ERROR, "\f9FanEd\f7::whoisdump: \f3#error: \f7failed to open \f4%s\f7 for writing", faned_whois());
-                            playsound(S_ERROR);
-                            return 1;
-                        }
-                        if(!strstr(client->name, "unnamed") && !strstr(curip, "0.0.0.*"))
-                        {
-                            fw->printf("%s:%s", curip, client->name);
-                            fw->printf("\n");
-                            if(autowhoisdump == 2)
-                            {
-                                conoutf(CON_INFO, "\f9FanEd\f7::whoisdump: \f0#success: \f7new database entry \f4%s:%s", curip, client->name);
-                            }
-                        }
-                        else if(autowhoisdump == 2 && strstr(curip, "0.0.0.*"))
-                        {
-                            conoutf(CON_INFO, "\f9FanEd\f7::whoisdump: \f6#exception: \f7extinfo returned \f40.0.0.*");
-                        }
-                        else if(autowhoisdump == 2 && strstr(client->name, "unnamed"))
-                        {
-                            conoutf(CON_INFO, "\f9FanEd\f7::whoisdump: \f6#exception: \f7client name is unnamed");
-                        }
-                        fw->close();
-                    }
-                    else found = false;
-                    fr->close();
-                }
-            }
-        }
-        return 0;
-    }
-
-    void dowhoisdump(int cn)
-    {
-        SDL_Thread * thread;
-        int threadReturnValue;
-        thread = SDL_CreateThread(whoisdump, (void *)cn);
-        if(NULL == thread)
-        {
-            conoutf(CON_ERROR, "\f9FanEd\f7::whoisdump: \f3#error: \f7SDL_CreateThread failed: \f4%s", SDL_GetError());
-            playsound(S_ERROR);
-        }
-        else SDL_WaitThread(thread, &threadReturnValue);
-    }
-    ICOMMAND(whoisdump, "i", (int *cn), dowhoisdump(*cn));
+    VARP(autowhois, 0, 0, 2);
+    
+    SDL_Thread * whoisthread;
     
     int whois(void* data)
     {
@@ -747,6 +630,14 @@ namespace game
                         return 1;
                     }
                     
+                    stream *fw = openutf8file(path(faned_whois(), true), "a");
+                    if(!fw)
+                    {
+                        conoutf(CON_ERROR, "\f9FanEd\f7::whois: \f3#error: \f7failed to open \f4%s\f7 for writing", faned_whois());
+                        playsound(S_ERROR);
+                        return 1;
+                    }
+
                     int i = 1;
                     char linebuf[30];
                     bool found = false;
@@ -778,9 +669,32 @@ namespace game
                             client->clientnum,
                             curip
                         );
+                        if(!strstr(client->name, "unnamed") && !strstr(curip, "0.0.0.*"))
+                        {
+                            fw->printf("%s:%s", curip, client->name);
+                            fw->printf("\n");
+                            if(autowhois == 2)
+                            {
+                                conoutf(CON_INFO, "\f9FanEd\f7::whois: \f0#success: \f7new database entry \f4%s:%s", curip, client->name);
+                            }
+                        }
+                        else if(autowhois == 2 && strstr(curip, "0.0.0.*"))
+                        {
+                            conoutf(CON_INFO, "\f9FanEd\f7::whois: \f6#exception: \f7extinfo returned \f40.0.0.*");
+                        }
+                        else if(autowhois == 2 && strstr(client->name, "unnamed"))
+                        {
+                            conoutf(CON_INFO, "\f9FanEd\f7::whois: \f6#exception: \f7client name is unnamed");
+                        }
+                        fr->close();
+                        fw->close();
                     }
-                    else found = false;
-                    fr->close();
+                    else
+                    {
+                        found = false;
+                        fr->close();
+                        fw->close();
+                    }
                 }
             }
         }
@@ -789,15 +703,12 @@ namespace game
 
     void dowhois(int cn)
     {
-        SDL_Thread * thread;
-        int threadReturnValue;
-        thread = SDL_CreateThread(whois, (void *)cn);
-        if(NULL == thread)
+        whoisthread = SDL_CreateThread(whois, (void *)cn);
+        if(NULL == whoisthread)
         {
             conoutf(CON_ERROR, "\f9FanEd\f7::whois: \f3#error: \f7SDL_CreateThread failed: \f4%s", SDL_GetError());
             playsound(S_ERROR);
         }
-        else SDL_WaitThread(thread, &threadReturnValue);
     }
     ICOMMAND(whois, "i", (int *cn), dowhois(*cn));
 
@@ -835,14 +746,13 @@ namespace game
     void dowhowas(const char *name)
     {
         SDL_Thread * thread;
-        int threadReturnValue;
         thread = SDL_CreateThread(whowas, (void *)(int)name);
         if(NULL == thread)
         {
             conoutf(CON_ERROR, "\f9FanEd\f7::whowas: \f3#error: \f7SDL_CreateThread failed: \f4%s", SDL_GetError());
             playsound(S_ERROR);
         }
-        else SDL_WaitThread(thread, &threadReturnValue);
+        else SDL_WaitThread(thread, NULL);
     }
     ICOMMAND(whowas, "s", (const char *name), dowhowas(name));
     // End: Fanatic Edition
@@ -2270,15 +2180,11 @@ namespace game
                 getstring(text, p);
                 filtertext(d->team, text, false, MAXTEAMLEN);
                 d->playermodel = getint(p);
-                // Start: Fanatic Edition
-                if(autowhois) dowhois(d->clientnum);
-                if(autowhoisdump) dowhoisdump(d->clientnum);
-                // End: Fanatic Edition
+                if(autowhois) dowhois(d->clientnum); // Fanatic Edition
                 break;
             }
 
             case N_SWITCHNAME:
-                // Start: Fanatic Edition
                 getstring(text, p);
                 if(d)
                 {
@@ -2290,8 +2196,7 @@ namespace game
                         copystring(d->name, text, MAXNAMELEN+1);
                     }
                 }
-                if(autowhoisdump) dowhoisdump(d->clientnum);
-                // End: Fanatic Edition
+                if(autowhois) dowhois(d->clientnum); // Fanatic Edition
                 break;
 
             case N_SWITCHMODEL:

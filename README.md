@@ -297,6 +297,10 @@
 <sub>`$getvelz`;</sub><br />
 <sub>`$getyaw`;</sub><br />
 
+<sub>> Additional:</sub><br />
+
+<sub>`(getteamscore STR)`</sub><br />
+
 <sub>> `(getclientinfo CN TYPE)` Get client informations (all clients);</sub><br />
 
 <sub>`TYPE  1: return client's current ai`;</sub><br />
@@ -347,11 +351,6 @@
 <sub>`TYPE 46: return client's current vel.z`;</sub><br />
 <sub>`TYPE 47: return client's current weight`;</sub><br />
 <sub>`TYPE 48: return client's current yaw`;</sub><br />
-
-<sub>> Additional:</sub><br />
-
-<sub>`(getclientip iNT)`</sub><br />
-<sub>`(getteamscore STR)`</sub><br />
 
 #####₪ Commands: IRC
 

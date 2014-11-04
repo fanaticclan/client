@@ -2674,7 +2674,7 @@ void gl_drawhud(int w, int h)
 
                 if(m_check(game::gamemode, M_TEAM))
                 {
-                    if(showteamscores && showtimeremaining) draw_textf("%s @ %s", conw-(game::cmode ? (fontfix ? 7 : 7.7) : (fontfix ? 5.2 : 6.2))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), strcmp(game::player1->team, "good") == 0 ? scoresgood : scoresevil, time);
+                    if(showteamscores && showtimeremaining) draw_textf("%s / %s", conw-(game::cmode ? (fontfix ? 7 : 7.7) : (fontfix ? 5.2 : 6.2))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), strcmp(game::player1->team, "good") == 0 ? scoresgood : scoresevil, time);
                     else if(showteamscores && !showtimeremaining) draw_textf("%s", conw-(game::cmode ? (fontfix ? 5.5 : 6.2) : (fontfix ? 2.3 : 3.3))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), strcmp(game::player1->team, "good") == 0 ? scoresgood : scoresevil);
                     else if(!showteamscores && showtimeremaining) draw_textf("%s", conw-(game::cmode ? (fontfix ? 5.8 : 6.5) : (fontfix ? 2.8 : 3.8))*FONTH, FONTH*(game::cmode ? (fontfix ? 10 : 11) : (fontfix ? 0.7 : 1)), time);
                 }

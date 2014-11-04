@@ -1,4 +1,4 @@
-![Fanatic Edition](http://i.imgur.com/cp3CFWO.png)
+#Fanatic Edition
 
 #####₪ About
 

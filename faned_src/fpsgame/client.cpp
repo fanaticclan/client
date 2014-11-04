@@ -1924,7 +1924,6 @@ namespace game
                 getstring(text, p);
                 filtertext(d->team, text, false, MAXTEAMLEN);
                 d->playermodel = getint(p);
-                if(autowhois) dowhois(d->clientnum); // Fanatic Edition
                 break;
             }
 
@@ -1940,7 +1939,6 @@ namespace game
                         copystring(d->name, text, MAXNAMELEN+1);
                     }
                 }
-                if(autowhois) dowhois(d->clientnum); // Fanatic Edition
                 break;
 
             case N_SWITCHMODEL:

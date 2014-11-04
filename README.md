@@ -1,3 +1,5 @@
+![Fanatic Edition](http://i.imgur.com/cp3CFWO.png)
+
 #####₪ About
 
 <sub>Fanatic Edition is an experimental [Cube 2: Sauerbraten](http://sauerbraten.org) client modification, developed by [Fanatic](http://fanaticclan.com) members, available for Windows and Linux and [licensed](https://www.youtube.com/watch?v=IeTybKL1pM4) under the [zlib/libpng](http://www.opensource.org/licenses/zlib-license.php) license. The project itself is currently in *alpha* state and bugs/fixes appear daily. If you want to live on the bleeding edge of our development, feel free to try out our client and/or report bugs at our [IRC channel](https://kiwiirc.com/client/chat.kerat.net/?#fanatic).</sub>
@@ -172,6 +174,7 @@
 <sub>`sgshotsize FLOAT`</sub><br />
 <sub>`shotsparks 0|1`</sub><br />
 <sub>`showbuildversion 0|1` Enable or disable Fanatic Edition's build version in main menu;</sub><br />
+<sub>`showteamscores 0|1` Show team scores time at upper right corner/below minimap;</sub><br />
 <sub>`showtimeremaining 0|1` Show remaining time at upper right corner/below minimap;</sub><br />
 <sub>`smokecolorrainbow 0|1`</sub><br />
 <sub>`smokecolor RGB|HEX`</sub><br />
@@ -287,6 +290,8 @@
 <sub>`$getpitch`;</sub><br />
 <sub>`$getspeed`;</sub><br />
 <sub>`$getstate`;</sub><br />
+<sub>`$getsuicides`;</sub><br />
+<sub>`$getteamkills`;</sub><br />
 <sub>`$getvelx`;</sub><br />
 <sub>`$getvely`;</sub><br />
 <sub>`$getvelz`;</sub><br />
@@ -388,13 +393,6 @@
 <sub>`velocity FLOAT`</sub><br />
 <sub>`wallz FLOAT`</sub><br />
 
-#####₪ Commands: Tracking
-
-<sub>`autowhois 0|1` Will run `whois cn` requests when players connect or change their names;</sub><br />
-<sub>`autowhoisdump 0|2` Dumps new database entries when players connect or change their names; 1: *default*, 2: *verbose*;</sub><br />
-<sub>`whois CN` Check CN's IP against your current collected database entries;</sub><br />
-<sub>`whowas STR` Check STR (clientname or IP) against your current collected database entries;</sub><br />
-
 #####₪ Commands: View
 
 <sub>`lookup iNT`</sub><br />
@@ -417,22 +415,22 @@
 
 #####₪ Credits
 
-<sub>**[Nyne](https://github.com/gitnyne/)**: Main Development, C++, Lua, CubeScript, Design</sub><br />
-<sub>**[bum](https://github.com/Incognito357)**: C++, Lua, CubeScript</sub><br />
-<sub>**[Pyccna](http://quadropolis.us/user/5493)**: Playermodel Reskins and Hudguns</sub><br />
-<sub>**[Wrack](https://github.com/wrack/)**: Marching Cubes functions</sub><br />
-<sub>**Q009**: SauerEnhanced functions</sub><br />
-<sub>**[AC](http://sourceforge.net/u/ac-sauer/profile/)**: C++ and Lua Milestones</sub><br />
-<sub>**[RaZgRiZ](http://pastebin.com/u/RaZgRiZ)**: CubeScript Martial Arts</sub><br />
+<sub>★ **[Nyne](https://github.com/gitnyne/)**: Main Development, Design, C, Lua, CubeScript</sub><br />
+<sub>★ **[bum](https://github.com/Incognito357)**: C, Lua, CubeScript</sub><br />
+<sub>★ **[Pyccna](http://quadropolis.us/user/5493)**: Playermodel Reskins and Hudguns</sub><br />
+<sub>★ **[Wrack](https://github.com/wrack/)**: Marching Cubes functions</sub><br />
+<sub>★ **Q009**: SauerEnhanced functions</sub><br />
+<sub>★ **[AC](http://sourceforge.net/u/ac-sauer/profile/)**: CMEd functions</sub><br />
+<sub>★ **[RaZgRiZ](http://pastebin.com/u/RaZgRiZ)**: CubeScript Martial Arts</sub><br />
 
 #####₪ Original Cube 2: Sauerbraten:
 
-<sub>**[Wouter "Aardappel" van Oortmerssen](http://strlen.com/)**</sub><br />
-<sub>**[Lee "eihrul" Salzman](http://sauerbraten.org/lee/)**</sub><br />
-<sub>Mike "Gilt" Dysart</sub><br />
-<sub>Robert "baby-rabbit" Pointon</sub><br />
-<sub>John "geartrooper" Siar</sub><br />
-<sub>Quinton "Quin" Reeves and others.</sub><br />
+<sub>★ **[Wouter "Aardappel" van Oortmerssen](http://strlen.com/)**</sub><br />
+<sub>★ **[Lee "eihrul" Salzman](http://sauerbraten.org/lee/)**</sub><br />
+<sub>★ Mike "Gilt" Dysart</sub><br />
+<sub>★ Robert "baby-rabbit" Pointon</sub><br />
+<sub>★ John "geartrooper" Siar</sub><br />
+<sub>★ Quinton "Quin" Reeves and others.</sub><br />
 
 #####₪ Contact
 

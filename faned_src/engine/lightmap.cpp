@@ -518,50 +518,35 @@ static void updatelightmap(const layoutinfo &surface)
 
 // Start: Fanatic Edition: »Ambient Occlusion« by a_teammate;
 VARR(ambientocclusion, 0, 0, 255);
-FVARR(ambientocclusionradius, 1.0f, 2.0f, 40.0f);
-FVARR(ambientocclusionprecision, 0, 4.0f, 17.0f);
+FVARR(ambientocclusionradius, 1.0, 2.0, 200.0);
+FVARR(ambientocclusionprecision, 0, 4.0, 17.0); 
 VAR(debugambientocclusion, 0, 0, 1);
 
 static float calcocclusion(const vec &o, const vec &normal, float tolerance)
 {
-    static const vec rays[17] =
-    { 
-        vec(0, 0, 1),
-        
-        vec(cosf(21*RAD)*cosf(50*RAD), sinf(21*RAD)*cosf(50*RAD), sinf(50*RAD)),
-        vec(cosf(111*RAD)*cosf(50*RAD), sinf(111*RAD)*cosf(50*RAD), sinf(50*RAD)),
-        vec(cosf(201*RAD)*cosf(50*RAD), sinf(201*RAD)*cosf(50*RAD), sinf(50*RAD)), 
-        vec(cosf(291*RAD)*cosf(50*RAD), sinf(291*RAD)*cosf(50*RAD), sinf(50*RAD)),
-
-        vec(cosf(43*RAD)*cosf(60*RAD), sinf(43*RAD)*cosf(60*RAD), sinf(60*RAD)),
-        vec(cosf(133*RAD)*cosf(60*RAD), sinf(133*RAD)*cosf(60*RAD), sinf(60*RAD)),
-        vec(cosf(223*RAD)*cosf(60*RAD), sinf(223*RAD)*cosf(60*RAD), sinf(60*RAD)),
-        vec(cosf(313*RAD)*cosf(60*RAD), sinf(313*RAD)*cosf(60*RAD), sinf(60*RAD)),
-
-        vec(cosf(66*RAD)*cosf(70*RAD), sinf(66*RAD)*cosf(70*RAD), sinf(70*RAD)),
-        vec(cosf(156*RAD)*cosf(70*RAD), sinf(156*RAD)*cosf(70*RAD), sinf(70*RAD)),
-        vec(cosf(246*RAD)*cosf(70*RAD), sinf(246*RAD)*cosf(70*RAD), sinf(70*RAD)),
-        vec(cosf(336*RAD)*cosf(70*RAD), sinf(336*RAD)*cosf(70*RAD), sinf(70*RAD)),
-
-        vec(cosf(88*RAD)*cosf(80*RAD), sinf(88*RAD)*cosf(80*RAD), sinf(80*RAD)),
-        vec(cosf(178*RAD)*cosf(80*RAD), sinf(178*RAD)*cosf(80*RAD), sinf(80*RAD)),
-        vec(cosf(268*RAD)*cosf(80*RAD), sinf(268*RAD)*cosf(80*RAD), sinf(80*RAD)),
-        vec(cosf(358*RAD)*cosf(80*RAD), sinf(358*RAD)*cosf(80*RAD), sinf(80*RAD)),                  
+    static const vec rays[5] =
+    {
+            vec(0, 0, 1),
+            vec(cosf(66*RAD)*cosf(65*RAD), sinf(66*RAD)*cosf(65*RAD), sinf(65*RAD)),
+            vec(cosf(156*RAD)*cosf(65*RAD), sinf(156*RAD)*cosf(65*RAD), sinf(65*RAD)),
+            vec(cosf(246*RAD)*cosf(65*RAD), sinf(246*RAD)*cosf(65*RAD), sinf(65*RAD)),
+            vec(cosf(336*RAD)*cosf(65*RAD), sinf(336*RAD)*cosf(65*RAD), sinf(65*RAD))        
     };
 
     matrix3x3 rotationmatrix;
     bool needsrotation = false;
     if(normal != rays[0]) 
     {
-        vec axis; 
+    vec axis; 
         axis.cross(rays[0], normal);
         if(axis.magnitude() == 0)  axis = vec(1, 0, 0);
         float angle = acos(rays[0].dot(normal));
         rotationmatrix.rotate(angle, axis);
         needsrotation = true;
     }
+
     int occluedrays = 0;
-    loopi(17) 
+    loopi(sizeof(rays)/sizeof(vec)) 
     {    
         if(occluedrays >= ambientocclusionprecision) break;        
         vec ray(needsrotation ? rotationmatrix.transform(rays[i]) : rays[i]);

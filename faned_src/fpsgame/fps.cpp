@@ -216,7 +216,7 @@ namespace game
                     switchteam(players[i]->team);
                 }
 
-	        if(_autoswitchmode == 2 && strcmp(players[i]->team, player1->team) == 0)
+            if(_autoswitchmode == 2 && strcmp(players[i]->team, player1->team) == 0)
                 {
                     strcmp(player1->team, "good") == 0 ? switchteam("evil") : switchteam("good");
                 }
@@ -615,7 +615,7 @@ namespace game
 
                 if(autosaysorry)
                 {
-            	    defformatstring(msg)(autosaysorrymsg, dname);
+                    defformatstring(msg)(autosaysorrymsg, dname);
                     if(autosayteam) sayteam(msg);
                     else toserver(msg);
                 }
@@ -631,7 +631,7 @@ namespace game
                 
                 if(autosaynp)
                 {
-            	    defformatstring(msg)(autosaynpmsg, aname);
+                    defformatstring(msg)(autosaynpmsg, aname);
                     if(autosayteam) sayteam(msg);
                     else toserver(msg);
                 }
@@ -677,7 +677,7 @@ namespace game
         }
 
         deathstate(d);
-	ai::killed(d, actor);
+        ai::killed(d, actor);
  
         if(d == player1 && actor != player1 && deathcamera)
         {
@@ -765,11 +765,13 @@ namespace game
             if(identexists("intermission")) execute("intermission"); // Legacy
             if(identexists("onintermission")) execute("onintermission");
 
-            if(m_teammode)
+            if(m_teammode && player1->state != CS_SPECTATOR)
             {
                 int scoregood = getteamscore("good");
                 int scoreevil = getteamscore("evil");
                 if(strcmp(player1->team, "good") == 0 && scoregood > scoreevil) playsound(S_WIN);
+                else if(strcmp(player1->team, "good") == 0 && scoregood < scoreevil) playsound(S_LOSE);
+                else if(strcmp(player1->team, "evil") == 0 && scoregood < scoreevil) playsound(S_WIN);
                 else if(strcmp(player1->team, "evil") == 0 && scoregood > scoreevil) playsound(S_LOSE);
                 else if(scoregood == scoreevil) playsound(S_TIE);
             }
@@ -1066,7 +1068,6 @@ namespace game
         else if(d->type==ENT_AI) suicidemonster((monster *)d);
         else if(d->type==ENT_INANIMATE) suicidemovable((movable *)d);
     }
-    ICOMMAND(kill, "", (), suicide(player1));
     ICOMMAND(suicide, "", (), suicide(player1));
 
     bool needminimap() { return m_ctf || m_protect || m_hold || m_capture || m_collect; }
@@ -1426,7 +1427,7 @@ namespace game
             if(cmode) cmode->drawhud(d, w, h);
         }
 
-        if(!deathcamerastate && hudstats && player1->state != CS_EDITING && player1->state != CS_SPECTATOR && !getvar("scoreboard"))
+        if(!deathcamerastate && hudstats && player1->state != CS_EDITING && !getvar("scoreboard"))
         {
             static int lastfps = 0, prevfps[3] = { 0, 0, 0 }, curfps[3] = { 0, 0, 0 };
             if(totalmillis - lastfps >= 200)
@@ -1438,60 +1439,61 @@ namespace game
             getfps(nextfps[0], nextfps[1], nextfps[2]);
             loopi(3) if(prevfps[i] == curfps[i]) curfps[i] = nextfps[i];
 
-            float speed = player1->vel.magnitude();
-            speed+= 0.5;
-            int curspeed = player1->state != CS_DEAD ? (int)speed : NULL;
+            fpsent *d = hudplayer();
 
-            float kpd =  float(player1->frags) / max(float(player1->deaths), 1.0f);
-            int accuracy = (player1->totaldamage*100)/max(player1->totalshots, 1);
+            float speed = d->vel.magnitude();
+            speed+= 0.5;
+            int curspeed = d->state != CS_DEAD ? (int)speed : NULL;
+
+            float kpd =  float(d->frags) / max(float(d->deaths), 1.0f);
+            int accuracy = (d->totaldamage*100)/max(d->totalshots, 1);
 
             if(cmode)
             {
                 draw_textfa("\f%sFPS:\nPing:\nSpeed:\n\n%s:\nFrags:\nK.p.D.:\nDeaths:\nAccuracy:", hudstatsalpha, 30, 420, hudstatscolor, m_collect ? "Skulls" : "Flags");
-                draw_textfa("\f%s%d\n%d\n%d\n\n%d\n%d\n%4.2f\n%d\n%d%%", hudstatsalpha, 300, 420, hudstatscolor, curfps[0], player1->ping, curspeed, player1->flags, player1->frags, kpd, player1->deaths, accuracy);
+                draw_textfa("\f%s%d\n%d\n%d\n\n%d\n%d\n%4.2f\n%d\n%d%%", hudstatsalpha, 300, 420, hudstatscolor, curfps[0], d->ping, curspeed, d->flags, d->frags, kpd, d->deaths, accuracy);
             }
             else
             {
                 draw_textfa("\f%sFPS:\nPing:\nSpeed:\n\nFrags:\nK.p.D.:\nDeaths:\nAccuracy:", hudstatsalpha, 30, 480, hudstatscolor);
-                draw_textfa("\f%s%d\n%d\n%d\n\n%d\n%4.2f\n%d\n%d%%", hudstatsalpha, 300, 480, hudstatscolor, curfps[0], player1->ping, curspeed, player1->frags, kpd, player1->deaths, accuracy);
+                draw_textfa("\f%s%d\n%d\n%d\n\n%d\n%4.2f\n%d\n%d%%", hudstatsalpha, 300, 480, hudstatscolor, curfps[0], d->ping, curspeed, d->frags, kpd, d->deaths, accuracy);
             }
         }
 
-        if(!deathcamerastate && hudminiscoreboard && player1->state != CS_EDITING && player1->state != CS_SPECTATOR && !getvar("scoreboard"))
+        if(!deathcamerastate && hudminiscoreboard && player1->state != CS_EDITING && !getvar("scoreboard"))
         {
-
             glPushMatrix();
-	    glScalef(0.7, 0.7, 1);
+            glScalef(0.7, 0.7, 1);
 
-        	int iplayers = 0;
-        	loopv(players) iplayers++;
-                players.sort(playerslist);
+            int iplayers = 0;
+            loopv(players) iplayers++;
+            players.sort(playerslist);
 
-                int iplayerssorted = 0;
-                loopv(players)
+            int iplayerssorted = 0;
+            loopv(players)
+            {
+                int pw, ph, th, fw, fh;
+                text_bounds("  ", pw, ph);
+                th = max(th, ph);
+                fpsent *f = players[i];
+                defformatstring(fplayer)("%s \f%d(%d)", f ? (duplicatename(f, f->name) ? f->name : colorname(f)) : NULL, f ? (duplicatename(f, f->name) ? 5 : 4) : NULL, f ? f->clientnum : NULL);
+                text_bounds(f ? fplayer : " ", fw, fh);
+                fh = max(fh, ph);
+
+                iplayerssorted++;
+                if(iplayerssorted <= (cmode ? hudminiscoreboardlimitcmode : hudminiscoreboardlimit))
                 {
-                    int pw, ph, th, fw, fh;
-                    text_bounds("  ", pw, ph);
-                    th = max(th, ph);
-                    fpsent *f = players[i];
-                    defformatstring(fplayer)("%s \f%d(%d)", f ? (duplicatename(f, f->name) ? f->name : colorname(f)) : NULL, f ? (duplicatename(f, f->name) ? 5 : 4) : NULL, f ? f->clientnum : NULL);
-                    text_bounds(f ? fplayer : " ", fw, fh);
-                    fh = max(fh, ph);
+                    fpsent *hudminiscoreboardplayer = players[i];
+                    float kpd =  float(hudminiscoreboardplayer->frags) / max(float(hudminiscoreboardplayer->deaths), 1.0f);
+                    int accuracy = (hudminiscoreboardplayer->totaldamage*100)/max(hudminiscoreboardplayer->totalshots, 1);
 
-                    iplayerssorted++;
-                    if(iplayerssorted <= (cmode ? hudminiscoreboardlimitcmode : hudminiscoreboardlimit))
-                    {
-                        fpsent *hudminiscoreboardplayer = players[i];
-                        float kpd =  float(hudminiscoreboardplayer->frags) / max(float(hudminiscoreboardplayer->deaths), 1.0f);
-                        int accuracy = (hudminiscoreboardplayer->totaldamage*100)/max(hudminiscoreboardplayer->totalshots, 1);
-
-                        draw_textfa("\f%s%s \f4(%d)", hudminiscoreboardalpha, 1365*3 - fw - pw, cmode ? (443+i*30)*2 : (m_edit ? (29+i*30)*2 : (90+i*30)*2), hudminiscoreboardcolor, hudminiscoreboardplayer->name, hudminiscoreboardplayer->clientnum); // FIXME: Sort by X, use text_bounds;
-                        draw_textfa("\f%s%s%d %s%d %s%4.2f %d%% ", hudminiscoreboardalpha, 1200*3+460, cmode ? (443+i*30)*2 : (m_edit ? (29+i*30)*2 : (90+i*30)*2), hudminiscoreboardcolor, (hudminiscoreboardplayer->frags >= 0 && hudminiscoreboardplayer->frags < 10) ? "0" : "", hudminiscoreboardplayer->frags, hudminiscoreboardplayer->deaths <= 9 ? "0" : "", hudminiscoreboardplayer->deaths, (kpd >= 0 && kpd < 10) ? "0" : "", kpd, accuracy);
-                    }
+                    draw_textfa("\f%s%s \f4(%d)", hudminiscoreboardalpha, 1365*3 - fw - pw, cmode ? (443+i*30)*2 : (m_edit ? (29+i*30)*2 : (90+i*30)*2), hudminiscoreboardcolor, hudminiscoreboardplayer->name, hudminiscoreboardplayer->clientnum);
+                    draw_textfa("\f%s%s%d %s%d %s%4.2f %d%% ", hudminiscoreboardalpha, 1200*3+460, cmode ? (443+i*30)*2 : (m_edit ? (29+i*30)*2 : (90+i*30)*2), hudminiscoreboardcolor, (hudminiscoreboardplayer->frags >= 0 && hudminiscoreboardplayer->frags < 10) ? "0" : "", hudminiscoreboardplayer->frags, hudminiscoreboardplayer->deaths <= 9 ? "0" : "", hudminiscoreboardplayer->deaths, (kpd >= 0 && kpd < 10) ? "0" : "", kpd, accuracy);
                 }
+            }
             glPopMatrix();
         }
-	glPopMatrix();
+        glPopMatrix();
     }
     // End: Fanatic Edition
 

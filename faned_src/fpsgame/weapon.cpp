@@ -657,7 +657,7 @@ namespace game
                     addmsg(N_EXPLODE, "rci3iv", p.owner, lastmillis-maptime, p.gun, p.id-maptime,
                             hits.length(), hits.length()*sizeof(hitmsg)/sizeof(int), hits.getbuf());
                 projs.remove(i--);
-                stopsound(S_ROCKET, p.pc); // Fanatic Edition
+                stopsound(S_ROCKET, p.pc, 3000); // Fanatic Edition
             }
             else p.o = v;
         }

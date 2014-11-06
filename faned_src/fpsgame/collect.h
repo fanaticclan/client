@@ -434,8 +434,8 @@ struct collectclientmode : clientmode
     {
         base &b = bases[i];
         // Start: Fanatic Edition
-        if(!joinred) settexture(b.team==collectteambase(player1->team) ? "packages/hud/blip_blue.png" : "packages/hud/blip_red.png", 3);
-        else settexture(b.team==collectteambase(player1->team) ? "packages/hud/blip_red.png" : "packages/hud/blip_blue.png", 3);
+        if(!joinred) settexture(b.team==collectteambase(player1->team) ? "faned/hud/blip_blue.png" : "faned/hud/blip_red.png", 3);
+        else settexture(b.team==collectteambase(player1->team) ? "faned/hud/blip_red.png" : "faned/hud/blip_blue.png", 3);
         // End: Fanatic Edition
         drawblip(d, x, y, s, b.o);
     }

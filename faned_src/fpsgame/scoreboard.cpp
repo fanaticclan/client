@@ -5,18 +5,18 @@ namespace game
 {
     // Start: Fanatic Edition
     VARP(scoreboard2d, 0, 1, 1);
-    VARP(showservinfo, 0, 1, 1);
+    VARP(showacc, 0, 1, 1);
     VARP(showclientnum, 0, 1, 1);
+    VARP(showconnecting, 0, 1, 1);
+    VARP(showdeaths, 0, 1, 1);
     VARP(showflags, 0, 1, 1);
     VARP(showfrags, 0, 1, 1);
-    VARP(showdeaths, 0, 1, 1);
+    VARP(showhighlight, 0, 1, 1);
     VARP(showkpd, 0, 1, 1);
-    VARP(showacc, 0, 1, 1);
-    VARP(showpj, 0, 1, 1);
     VARP(showping, 0, 1, 1);
+    VARP(showpj, 0, 1, 1);
+    VARP(showservinfo, 0, 1, 1);
     VARP(showspectators, 0, 1, 1);
-    VARP(highlightscore, 0, 1, 1);
-    VARP(showconnecting, 0, 1, 1);
     // End: Fanatic Edition
 
     static hashset<teaminfo> teaminfos;
@@ -191,7 +191,10 @@ namespace game
             
             scoregroup &sg = *groups[k];
 
+            g.space(1);
+
             g.pushlist(); // vertical
+
             g.pushlist(); // horizontal
 
             #define loopscoregroup(o, b) \
@@ -199,7 +202,7 @@ namespace game
             { \
                 fpsent *o = sg.players[i]; \
                 b; \
-            }    
+            }
 
             g.pushlist();
             if(sg.team && m_teammode)
@@ -209,16 +212,22 @@ namespace game
                 g.strut(1);
                 g.poplist();
             }
-            g.text("", 0, " ");
+
+            g.space(1);
+
             loopscoregroup(o,
             {
-                if(o==player1 && highlightscore && (multiplayer(false) || demoplayback || players.length() > 1))
+                if(o==player1 && showhighlight && (multiplayer(false) || demoplayback || players.length() > 1))
                 {
                     g.pushlist();
                     g.background(bgcolor, numgroups>1 ? 3 : 5);
                 }
-                g.text("", 0);
-                if(o==player1 && highlightscore && (multiplayer(false) || demoplayback || players.length() > 1)) g.poplist();
+                const playermodelinfo &mdl = getplayermodelinfo(o);
+                const char *icon;
+                if(!joinred) { icon = sg.team && m_teammode ? (isteam(player1->team, sg.team) ? mdl.blueicon : mdl.redicon) : mdl.ffaicon; }
+                else { icon = sg.team && m_teammode ? (isteam(player1->team, sg.team) ? mdl.redicon : mdl.blueicon) : mdl.ffaicon; }
+                g.text("", 0, icon);
+                if(o==player1 && showhighlight && (multiplayer(false) || demoplayback || players.length() > 1)) g.poplist();
             });
             g.poplist();
 
@@ -230,16 +239,6 @@ namespace game
                 else g.textf("%s: %d", fgcolor, NULL, sg.team, sg.score);
     
                 g.pushlist(); // horizontal
-            }
-
-            if(showclientnum || player1->privilege>=PRIV_MASTER)
-            {
-                g.space(1);
-                g.pushlist();
-                g.text("cn", fgcolor);
-                g.strut(4);
-                loopscoregroup(o, g.textf("%d", 0xFFFFDD, NULL, o->clientnum));
-                g.poplist();
             }
 
             g.pushlist();
@@ -256,6 +255,8 @@ namespace game
                 g.textf("%s ", status, NULL, colorname(o));
             });
             g.poplist();
+
+            g.space(1);
 
             if(showflags && cmode)
             {
@@ -306,6 +307,15 @@ namespace game
                 g.poplist();
             }
 
+            if(showclientnum || player1->privilege>=PRIV_MASTER)
+            {
+                g.pushlist();
+                g.text("cn", fgcolor);
+                g.strut(4);
+                loopscoregroup(o, g.textf("%d", 0xFFFFDD, NULL, o->clientnum));
+                g.poplist();
+            }
+
             if(showpj)
             {
                 g.pushlist();
@@ -350,29 +360,38 @@ namespace game
         if(showspectators && spectators.length())
         {
             g.separator();
-            g.pushlist();
 
             g.pushlist();
-            g.text("spectator", fgcolor, " ");
+
+            g.space(1);
+
+            g.text("spectators:", fgcolor);
+            g.poplist();
+
+            g.pushlist();
+
+            g.space(1);
+
+            g.pushlist();
+            g.text("name", fgcolor);
             loopv(spectators) 
             {
                 fpsent *o = spectators[i];
                 int status = 0xFFFFDD;
                 if(o->privilege) status = o->privilege>=PRIV_ADMIN ? 0xFF8000 : 0x40FF80;
-                if(o==player1 && highlightscore)
+                if(o==player1 && showhighlight)
                 {
                     g.pushlist();
                     g.background(bgcolor, 3);
                 }
                 g.text(colorname(o), status, "spectator");
-                if(o==player1 && highlightscore) g.poplist();
+                if(o==player1 && showhighlight) g.poplist();
             }
             g.poplist();
 
- 
             if(showclientnum)
             {
-                g.space(1);
+                g.space(2);
                 g.pushlist();
                 g.text("cn", fgcolor);
                 loopv(spectators) g.textf("%d", 0xFFFFDD, NULL, spectators[i]->clientnum);
@@ -381,7 +400,7 @@ namespace game
 
             if(showping)
             {
-                g.space(1);
+                g.space(2);
                 g.pushlist();
                 g.text("ping", fgcolor);
                 g.strut(5);

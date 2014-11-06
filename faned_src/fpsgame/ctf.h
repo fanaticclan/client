@@ -492,12 +492,12 @@ struct ctfclientmode : clientmode
         // Start: Fanatic Edition
         if(!joinred)
         {
-            settexture(m_hold && (!flagblip || !f.owner || lastmillis%1000 < 500) ? (flagblip ? "packages/hud/blip_neutral_flag.png" : "packages/hud/blip_neutral.png") : ((m_hold ? ctfteamflag(f.owner->team) : f.team)==ctfteamflag(player1->team) ? (flagblip ? "packages/hud/blip_blue_flag.png" : "packages/hud/blip_blue.png") : (flagblip ? "packages/hud/blip_red_flag.png" : "packages/hud/blip_red.png")), 3);
+            settexture(m_hold && (!flagblip || !f.owner || lastmillis%1000 < 500) ? (flagblip ? "faned/hud/blip_neutral_flag.png" : "faned/hud/blip_neutral.png") : ((m_hold ? ctfteamflag(f.owner->team) : f.team)==ctfteamflag(player1->team) ? (flagblip ? "faned/hud/blip_blue_flag.png" : "faned/hud/blip_blue.png") : (flagblip ? "faned/hud/blip_red_flag.png" : "faned/hud/blip_red.png")), 3);
             drawblip(d, x, y, s, flagblip ? (f.owner ? f.owner->o : (f.droptime ? f.droploc : f.spawnloc)) : f.spawnloc, flagblip);
         }
         else
         {
-            settexture(m_hold && (!flagblip || !f.owner || lastmillis%1000 < 500) ? (flagblip ? "packages/hud/blip_neutral_flag.png" : "packages/hud/blip_neutral.png") : ((m_hold ? ctfteamflag(f.owner->team) : f.team)==ctfteamflag(player1->team) ? (flagblip ? "packages/hud/blip_red_flag.png" : "packages/hud/blip_red.png") : (flagblip ? "packages/hud/blip_blue_flag.png" : "packages/hud/blip_blue.png")), 3);
+            settexture(m_hold && (!flagblip || !f.owner || lastmillis%1000 < 500) ? (flagblip ? "faned/hud/blip_neutral_flag.png" : "faned/hud/blip_neutral.png") : ((m_hold ? ctfteamflag(f.owner->team) : f.team)==ctfteamflag(player1->team) ? (flagblip ? "faned/hud/blip_red_flag.png" : "faned/hud/blip_red.png") : (flagblip ? "faned/hud/blip_blue_flag.png" : "faned/hud/blip_blue.png")), 3);
             drawblip(d, x, y, s, flagblip ? (f.owner ? f.owner->o : (f.droptime ? f.droploc : f.spawnloc)) : f.spawnloc, flagblip);
         }
         // End: Fanatic Edition
@@ -557,7 +557,7 @@ struct ctfclientmode : clientmode
 
         if(m_hold)
         {
-            settexture("packages/hud/blip_neutral.png", 3);
+            settexture("faned/hud/blip_neutral.png", 3);
             loopv(holdspawns) drawblip(d, x, y, s, holdspawns[i].o, false);
         }
         loopv(flags)
@@ -636,7 +636,7 @@ struct ctfclientmode : clientmode
                         pos, angle, 0,
                         MDL_GHOST | MDL_CULL_VFC | (f.droptime || f.owner ? MDL_LIGHT : 0),
                         NULL, NULL, 0, 0, 0.5f + 0.5f*(2*fabs(fmod(lastmillis/1000.0f, 1.0f) - 0.5f)));
-                rendermodel(!f.droptime && !f.owner ? &f.light : NULL, flagname, ANIM_MAPMODEL|ANIM_LOOP,
+            rendermodel(!f.droptime && !f.owner ? &f.light : NULL, flagname, ANIM_MAPMODEL|ANIM_LOOP,
                         pos, angle, 0,
                         MDL_DYNSHADOW | MDL_CULL_VFC | MDL_CULL_OCCLUDED | (f.droptime || f.owner ? MDL_LIGHT : 0),
                         NULL, NULL, 0, 0, 0.3f + (f.vistime ? 0.7f*min((lastmillis - f.vistime)/1000.0f, 1.0f) : 0.0f));

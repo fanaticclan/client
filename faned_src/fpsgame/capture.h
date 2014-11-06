@@ -574,7 +574,7 @@ struct captureclientmode : clientmode
                 setfont("digit_blue");
                 text_bounds(" ", fw, fh);
             }
-            else settexture("packages/hud/blip_blue.png", 3);
+            else settexture("faned/hud/blip_blue.png", 3);
             }
             else
             {
@@ -584,7 +584,7 @@ struct captureclientmode : clientmode
                 setfont("digit_red");
                 text_bounds(" ", fw, fh);
             }
-            else settexture("packages/hud/blip_red.png", 3);
+            else settexture("faned/hud/blip_red.png", 3);
         }
         // End: Fanatic Edition
         glPushMatrix();
@@ -593,10 +593,10 @@ struct captureclientmode : clientmode
         glScalef((s*blipsize)/fw, (s*blipsize)/fh, 1.0f);
         drawblips(d, blipsize, fw, fh, 1, showenemies);
         if(basenumbers) setfont("digit_grey");
-        else settexture("packages/hud/blip_grey.png", 3);
+        else settexture("faned/hud/blip_grey.png", 3);
         drawblips(d, blipsize, fw, fh, 0, showenemies);
         if(basenumbers) setfont("digit_red");
-        else settexture("packages/hud/blip_red.png", 3);
+        else settexture("faned/hud/blip_red.png", 3);
         drawblips(d, blipsize, fw, fh, -1, showenemies);
         if(showenemies) drawblips(d, blipsize, fw, fh, -2);
         glPopMatrix();

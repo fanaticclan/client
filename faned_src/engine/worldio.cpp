@@ -1,6 +1,7 @@
 // worldio.cpp: loading & saving of maps and savegames
 
 #include "engine.h"
+#include "game.h" // Fanatic Edition
 
 void cutogz(char *s) 
 {   
@@ -163,7 +164,7 @@ bool loadents(const char *fname, vector<entity> &ents, uint *crc)
 string ogzname, bakname, cfgname, picname;
 
 // Start: Fanatic Edition
-VARP(savebak, 0, 3, 3);
+VARP(savebak, 0, 1, 3);
 
 void setmapfilenames(const char *fname, const char *cname = 0)
 {
@@ -876,20 +877,32 @@ void loadvslots(stream *f, int numvslots)
     delete[] prev;
 }
 
+VARP(writeprotectogz, 0, 0, 1);
+
 bool save_world(const char *mname, bool nolms)
 {
     if(!*mname) mname = game::getclientmap();
+
     // Start: Fanatic Edition
+    if(writeprotectogz && fileexists(mname, "w"))
+    {
+        conoutf(CON_ERROR, "\f9FanEd\f7::save_world: \f3#error: \f7could not write \f4%s.ogz\f7; file exists", mname);
+        playsound(S_ERROR);
+        return false;
+    }
+
     string curtime;
     time_t t = time(NULL);
     size_t len = strftime(curtime, sizeof(curtime), "%Y-%m-%d_%H.%M.%S", localtime(&t));
     curtime[min(len, sizeof(curtime)-1)] = '\0';
     defformatstring(noname)("untitled_%s", curtime);
     setmapfilenames(*mname ? mname : noname);
+
     if(savebak) backup(ogzname, bakname);
     stream *f = opengzfile(ogzname, "wb");
     if(!f) { conoutf(CON_WARN, "\f9FanEd\f7::save_world: could not write map to %s", ogzname); return false; }
     // End: Fanatic Edition
+
     int numvslots = vslots.length();
     if(!nolms && !multiplayer(false))
     {

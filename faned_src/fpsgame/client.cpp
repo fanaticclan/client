@@ -146,13 +146,13 @@ namespace game
                     {
                         if(strcmp(d->team, "good") == 0 && playerstarts[i]->attr2 == 1)
                         {
-                            settexture(isteam(d->team, player1->team) ? "packages/hud/blip_blue.png" : "packages/hud/blip_red.png");
+                            settexture(isteam(d->team, player1->team) ? "faned/hud/blip_blue.png" : "faned/hud/blip_red.png");
                             drawplayerstartblip(d, x, y, s, playerstarts[i]->o, true);
                         }
 
                         else if(strcmp(d->team, "evil") == 0 && playerstarts[i]->attr2 == 2)
                         {
-                            settexture(isteam(d->team, player1->team) ? "packages/hud/blip_blue.png" : "packages/hud/blip_red.png");
+                            settexture(isteam(d->team, player1->team) ? "faned/hud/blip_blue.png" : "faned/hud/blip_red.png");
                             drawplayerstartblip(d, x, y, s, playerstarts[i]->o, true);
                         }
                     }
@@ -207,13 +207,13 @@ namespace game
                     {
                         if(strcmp(d->team, "good") == 0 && playerstarts[i]->attr2 == 1)
                         {
-                            settexture(isteam(d->team, player1->team) ? "packages/hud/blip_red.png" : "packages/hud/blip_blue.png");
+                            settexture(isteam(d->team, player1->team) ? "faned/hud/blip_red.png" : "faned/hud/blip_blue.png");
                             drawplayerstartblip(d, x, y, s, playerstarts[i]->o, true);
                         }
 
                         else if(strcmp(d->team, "evil") == 0 && playerstarts[i]->attr2 == 2)
                         {
-                            settexture(isteam(d->team, player1->team) ? "packages/hud/blip_red.png" : "packages/hud/blip_blue.png");
+                            settexture(isteam(d->team, player1->team) ? "faned/hud/blip_red.png" : "faned/hud/blip_blue.png");
                             drawplayerstartblip(d, x, y, s, playerstarts[i]->o, true);
                         }
                     }
@@ -1538,6 +1538,11 @@ namespace game
                 fpsent *d = getclient(cn);
                 if(!d || d->lifesequence < 0 || d->state==CS_DEAD) continue;
                 // Start: Fanatic Edition
+                if(identexists("onteleport"))
+                {
+                    defformatstring(str)("onteleport %d %d %d", d->clientnum, tp, td);
+                    execute(str);
+                }
                 int it = (int)N_TELEPORT;
                 lua_N_EVENT(it, cn, tp, td, 0);
                 // End: Fanatic Edition
@@ -1551,6 +1556,11 @@ namespace game
                 fpsent *d = getclient(cn);
                 if(!d || d->lifesequence < 0 || d->state==CS_DEAD) continue;
                 // Start: Fanatic Edition
+                if(identexists("onjumppad"))
+                {
+                    defformatstring(str)("onjumppad %d %d", d->clientnum, jp);
+                    execute(str);
+                }
                 int it = (int)N_JUMPPAD;
                 lua_N_EVENT(it, cn, jp, 0, 0);
                 // End: Fanatic Edition
@@ -1865,6 +1875,11 @@ namespace game
                 mapchanged = true;
                 if(getint(p)) entities::spawnitems();
                 else senditemstoserver = false;
+                if(identexists("onmapchange"))
+                {
+                    defformatstring(str)("onmapchange %s", text);
+                    execute(str);
+                }
                 break;
 
             case N_FORCEDEATH:
@@ -1924,6 +1939,11 @@ namespace game
                 getstring(text, p);
                 filtertext(d->team, text, false, MAXTEAMLEN);
                 d->playermodel = getint(p);
+                if(identexists("onconnect"))
+                {
+                    defformatstring(str)("onconnect %d %d", d->clientnum, d->playermodel);
+                    execute(str);
+                }
                 break;
             }
 
@@ -2085,13 +2105,13 @@ namespace game
                 fpsent *target = getclient(tcn),
                        *actor = getclient(acn);
                 if(!target || !actor) break;
-                lua_N_DAMAGE(acn, tcn, damage, armour, health); // Fanatic Edition
                 target->armour = armour;
                 target->health = health;
                 if(target->state == CS_ALIVE && actor != player1) target->lastpain = lastmillis;
                 damaged(damage, target, actor, false);
-                if(!actor->skill && actor != player1) actor->totaldamage += damage; // Fanatic Edition
-                fpsent *d = getclient(acn); // Fanatic Edition
+                // Start: Fanatic Edition
+                if(!actor->skill && actor != player1) actor->totaldamage += damage;
+                fpsent *d = getclient(acn);
                 if(debugdamage && target == player1)
                 {
                     conoutf(CON_DEBUG,
@@ -2100,7 +2120,14 @@ namespace game
                         d->clientnum,
                         damage
                     );
-                } // Fanatic Edition
+                }
+                if(identexists("ondamage"))
+                {
+                    defformatstring(str)("ondamage %d %d %d %d", actor->clientnum, target->clientnum, actor->gunselect, damage);
+                    execute(str);
+                }
+                lua_N_DAMAGE(acn, tcn, damage, armour, health);
+                // End: Fanatic Edition
                 break;
             }
 
@@ -2129,7 +2156,6 @@ namespace game
                 }
                 if(!victim) break;
                 // Start: Fanatic Edition
-                lua_N_DIED(vcn, acn, frags, tfrags);
                 if(fragrec)
                 {
                     string fraginfo;
@@ -2148,6 +2174,12 @@ namespace game
                     fragrecfile->printf("%s", fraginfo);
                     conoutf("\f9FanEd\f7::fragrec: id \f9#%d\f7 logged", fragrecid);
                 }
+                if(identexists("ondied"))
+                {
+                    defformatstring(str)("ondied %d %d %d", actor->clientnum, victim->clientnum, actor->gunselect);
+                    execute(str);
+                }
+                lua_N_DIED(acn, vcn, frags, tfrags);
                 // End: Fanatic Edition
                 killed(victim, actor);
                 break;
@@ -2168,12 +2200,12 @@ namespace game
             {
                 if(!d) return;
                 int gun = getint(p);
+                d->gunselect = clamp(gun, int(GUN_FIST), int(GUN_PISTOL));
+                playsound(S_WEAPLOAD, &d->o);
                 // Start: Fanatic Edition
                 int it = (int)N_GUNSELECT;
                 lua_N_EVENT(it, gun, d->clientnum, 0, 0);
                 // End: Fanatic Edition
-                d->gunselect = clamp(gun, int(GUN_FIST), int(GUN_PISTOL));
-                playsound(S_WEAPLOAD, &d->o);
                 break;
             }
 
@@ -2391,16 +2423,12 @@ namespace game
                 {
                     fpsent *m = mn==player1->clientnum ? player1 : newclient(mn);
                     int priv = getint(p);
-                    if(m)
-                    {
-                        m->privilege = priv;
-                        if(m == player1 && identexists("onclaim")) execute("onclaim");
-                    }
+                    if(m) m->privilege = priv;
                 }
                 if(mm != mastermode)
                 {
                     mastermode = mm;
-                    conoutf(CON_INFO, "\f9FanEd\f7::N_CURRENTMASTER: mastermode is %s \f4(%d)", server::mastermodename(mastermode), mastermode); // Fanatic Edition
+                    conoutf(CON_INFO, "mastermode is %s \f4(%d)", server::mastermodename(mastermode), mastermode); // Fanatic Edition
                 }
                 break;
             }
@@ -2408,7 +2436,7 @@ namespace game
             case N_MASTERMODE:
             {
                 mastermode = getint(p);
-                conoutf(CON_INFO, "\f9FanEd\f7::N_MASTERMODE: mastermode is %s \f4(%d)", server::mastermodename(mastermode), mastermode); // Fanatic Edition
+                conoutf(CON_INFO, "mastermode is %s \f4(%d)", server::mastermodename(mastermode), mastermode); // Fanatic Edition
                 break;
             }
 
@@ -2579,6 +2607,7 @@ namespace game
 
             default:
                 neterr("type", cn < 0);
+                conoutf(CON_ERROR, "\f9FanEd\f7::neterr: \f3type %d", cn < 0);
                 return;
         }
     }

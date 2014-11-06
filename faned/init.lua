@@ -22,7 +22,7 @@ function lua_N_DAMAGE(acn, tcn, damage, armour, health) end
 
 function lua_N_EVENT(event, arg1, arg2, arg3, arg4) end
 
-function lua_N_DIED(vcn, acn, frags, tfrags) end
+function lua_N_DIED(acn, vcn, frags, tfrags) end
 
 function lua_N_EDITMODE(cn, val) end
 

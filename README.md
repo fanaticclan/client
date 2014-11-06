@@ -24,30 +24,17 @@
 <sub>Download the latest Cube 2: Sauerbraten SVN repository [here](http://svn.code.sf.net/p/sauerbraten/code) or [here](http://sourceforge.net/p/sauerbraten/code/HEAD/tree/).</sub>
 
 <sub>Step §2:</sub><br />
-<sub>Download the latest Fanatic Edition repository [here](https://github.com/fanaticclan/client/archive/master.zip).</sub>
+<sub>Download the latest Fanatic Edition development release [here](https://github.com/fanaticclan/client/releases/latest)</sub>
 
 <sub>Step §3:</sub><br />
-<sub>Unzip and copy everythig into your fresh created Sauerbraten SVN directory.</sub>
+<sub>Unzip and copy everythig into your fresh created Sauerbraten directory; on linux, place *faned_client* into your *bin_unix/* directory, on windows, place *faned_client.exe* into your *bin/* directory.</sub>
 
 <sub>Step §4:</sub><br />
-<sub>If you dont want to compile yourself, get the latest binary for your system [here](https://github.com/fanaticclan/client/releases/latest); on linux, place *faned_client* into your *bin_unix/* directory, on windows, place *faned_client.exe* into your *bin/* directory.</sub>
-
-<sub>Step §5:</sub><br />
 <sub>On linux, run *faned.sh*, on windows, run *faned.bat*, to fire up the game.</sub>
 
 #####₪ Updating
 
-<sub>Step §1:</sub><br />
-<sub>Download the latest Fanatic Edition repository [here](https://github.com/fanaticclan/client/archive/master.zip).</sub>
-
-<sub>Step §2:</sub><br />
-<sub>If you dont want to compile yourself, get the latest binary for your system [here](https://github.com/fanaticclan/client/releases/latest); on linux, place *faned_client* into your *bin_unix/* directory, on windows, place *faned_client.exe* into your *bin/* directory.</sub>
-
-<sub>Step §3:</sub><br />
-<sub>Delete your configuration file *faned_config.cfg*.</sub>
-
-<sub>Step §4:</sub><br />
-<sub>On linux, run *faned.sh*, on windows, run *faned.bat*, to fire up the game.</sub>
+<sub>Same like installing, but remember to delete your configuration file *faned_config.cfg*; an outdated config file may result in errors.</sub>
 
 #####₪ Usage
 
@@ -75,9 +62,9 @@
 <sub>*»sYNDABC by sYNDERF« - Directory: tf_synderf_syndabc/*</sub><br />
 <sub>*»Tiny Font by SomeDude« - Directory: tf_somedude_tiny_font/*</sub><br />
 
-#####₪ Commands: Main
+#####₪ New Commands: Main
 
-<sub>`abort` Use this for proper crashing FanEd without saving changes to config files;</sub><br />
+<sub>`abort` Use this command for proper "crashing" FanEd;</sub><br />
 <sub>`anticheat 0|1` Enable or disable the anticheat detection system;</sub><br />
 <sub>`autorespawn 0|1`</sub><br />
 <sub>`autosaydisconnect 0|1`</sub><br />
@@ -119,7 +106,7 @@
 <sub>`crouch` Bind it to a key for experimental crouching (Note: Other players will **not** see you crouched.);</sub><br />
 <sub>`ctfsoundset "STR"` Set the desired soundset for ctf modes;</sub><br />
 <sub>`damagemotion 0|1` Enable or disable special effects after getting damage from explosives;</sub><br />
-<sub>`damageparticle 0|1` Enable or disable the damage information particle above players heads;</sub><br />
+<sub>`damageparticletext 0|1` Enable or disable the damage information particle above players heads;</sub><br />
 <sub>`date %FORMAT` Returns the current date/time in given format; example: `echo (date %Y-%m-%d %H:%M:%S)`;</sub><br />
 <sub>`deathcamera 0|1` Enable or disable experimental actor following after death (Note: Other players will **not** see you spectating.);</sub><br />
 <sub>`deathpanicscreen 0|1` Enable or disable the deathpanic eyeveins screen;</sub><br />
@@ -174,6 +161,7 @@
 <sub>`sgshotsize FLOAT`</sub><br />
 <sub>`shotsparks 0|1`</sub><br />
 <sub>`showbuildversion 0|1` Enable or disable Fanatic Edition's build version in main menu;</sub><br />
+<sub>`showhighlight 0|1`</sub><br />
 <sub>`showteamscores 0|1` Show team scores time at upper right corner/below minimap;</sub><br />
 <sub>`showtimeremaining 0|1` Show remaining time at upper right corner/below minimap;</sub><br />
 <sub>`smokecolorrainbow 0|1`</sub><br />
@@ -188,7 +176,7 @@
 <sub>`thirdpersonalpha 0-100`</sub><br />
 <sub>`zoomscope 0|1`</sub><br />
 
-#####₪ Commands: Editing
+#####₪ New Commands: Editing
 
 <sub>`ambientocclusion 0-255`</sub><br />
 <sub>`ambientocclusionradius 0.0-40.0`</sub><br />
@@ -242,15 +230,17 @@
 <sub>`teleportcn CN X Y Z` Teleport CN from his current position to X Y Z;</sub><br />
 <sub>`typegen "TEXT"` Write TEXT using premade cube fonts;</sub><br />
 <sub>`typegen_font "DiRECTORY"` Change the typegen's font;</sub><br />
+<sub>`writeprotectogz 0|1` Enable to protect already existing maps from overwriting;</sub><br />
 
-#####₪ Commands: Events
+#####₪ New Commands: Events
 
-<sub>> `on* [ action ]` Additional event hooks for player1's CubeScript usage;</sub><br />
+<sub>> `on* [ action ]` Additional event hooks for CubeScript usage;</sub><br />
+
+<sub>`ondemostart [ ]`;</sub><br />
+<sub>`ondemoend [ ]`;</sub><br />
 
 <sub>`onattack [ ]`;</sub><br />
-<sub>`onclaim [ ]`;</sub><br />
 <sub>`oncrouch [ ]`;</sub><br />
-<sub>`ondamage [ ]`;</sub><br />
 <sub>`ondeathbyenemy [ ]`;</sub><br />
 <sub>`ondeathbyteammate [ ]`;</sub><br />
 <sub>`ondropflag [ ]`;</sub><br />
@@ -267,17 +257,26 @@
 <sub>`ontakeflagteam [ ]`;</sub><br />
 <sub>`ontaunt [ ]`;</sub><br />
 
-#####₪ Commands: History
+<sub>> `on* [ action args ]` Additional event hooks for CubeScript usage with arguments;</sub><br />
 
-<sub>> Note: These commands load and save your /command history manually;</sub><br />
+<sub>`onconnect = [$arg1 $arg2 $arg3]` Returns: clientnum, playermodel;</sub><br />
+<sub>`ondamage = [$arg1 $arg2 $arg3 $arg4]` Returns: actor->clientnum, target->clientnum, actor->gunselect, damage;</sub><br />
+<sub>`ondied = [$arg1 $arg2 $arg3]` Returns actor->clientnum, victim->clientnum, actor->gunselect;</sub><br />
+<sub>`onjumppad = [$arg1 $arg2]` Returns: clientnum, jumppad;</sub><br />
+<sub>`onmapchange = [$arg1]` Returns: mapname;</sub><br />
+<sub>`onteleport = [$arg1 $arg2 $arg3]` Returns clientnum, teleport, teledest;</sub><br />
+
+#####₪ New Commands: History
+
+<sub>> Note: These New Commands load and save your /command history manually;</sub><br />
 <sub>> By default, FanEd will load your /command history automatically;</sub><br />
 
 <sub>`loadhistory`;</sub><br />
 <sub>`savehistory`;</sub><br />
 
-#####₪ Commands: Informations
+#####₪ New Commands: Informations
 
-<sub>> `$get*` Additional client informations (own client);</sub><br />
+<sub>> `$get*` Get client informations (own client);</sub><br />
 
 <sub>`$getarmour`;</sub><br />
 <sub>`$getcamposx`;</sub><br />
@@ -296,10 +295,6 @@
 <sub>`$getvely`;</sub><br />
 <sub>`$getvelz`;</sub><br />
 <sub>`$getyaw`;</sub><br />
-
-<sub>> Additional:</sub><br />
-
-<sub>`(getteamscore STR)`</sub><br />
 
 <sub>> `(getclientinfo CN TYPE)` Get client informations (all clients);</sub><br />
 
@@ -352,7 +347,22 @@
 <sub>`TYPE 47: return client's current weight`;</sub><br />
 <sub>`TYPE 48: return client's current yaw`;</sub><br />
 
-#####₪ Commands: IRC
+<sub>> `(get* iNT)` Get team score informations: STR = "evil" or "good";</sub><br />
+
+<sub>`(getteamscore STR)`</sub><br />
+
+<sub>> `(get* iNT [STR])` Get vslot informations: iNT = texture-id, STR = shader-parameter;</sub><br />
+
+<sub>`(getvalpha iNT)`;</sub><br />
+<sub>`(getvcolor iNT)`;</sub><br />
+<sub>`(getvlayer iNT)`;</sub><br />
+<sub>`(getvoffset iNT)`;</sub><br />
+<sub>`(getvrotate iNT)`;</sub><br />
+<sub>`(getvscale iNT)`;</sub><br />
+<sub>`(getvscroll iNT)`;</sub><br />
+<sub>`(getvshaderparam iNT STR)`;</sub><br />
+
+#####₪ New Commands: IRC
 
 <sub>`ircaddchan`</sub><br />
 <sub>`ircaddclient`</sub><br />
@@ -375,7 +385,7 @@
 <sub>`ircsay`</sub><br />
 <sub>`ircserv`</sub><br />
 
-#####₪ Commands: Physics
+#####₪ New Commands: Physics
 
 <sub>> Note: These commands work only in coop edit mode;</sub><br /></sub>
 
@@ -392,25 +402,10 @@
 <sub>`velocity FLOAT`</sub><br />
 <sub>`wallz FLOAT`</sub><br />
 
-#####₪ Commands: View
-
 <sub>`lookup iNT`</sub><br />
 <sub>`lookdown iNT`</sub><br />
 <sub>`lookleft iNT`</sub><br />
 <sub>`lookright iNT`</sub><br />
-
-#####₪ Commands: VSlots
-
-<sub>> `(get* iNT)` Get vSlot informations: iNT = Texture-ID, STR = Shader Parameter;</sub><br />
-
-<sub>`(getvalpha iNT)`;</sub><br />
-<sub>`(getvcolor iNT)`;</sub><br />
-<sub>`(getvlayer iNT)`;</sub><br />
-<sub>`(getvoffset iNT)`;</sub><br />
-<sub>`(getvrotate iNT)`;</sub><br />
-<sub>`(getvscale iNT)`;</sub><br />
-<sub>`(getvscroll iNT)`;</sub><br />
-<sub>`(getvshaderparam iNT STR)`;</sub><br />
 
 #####₪ Credits
 

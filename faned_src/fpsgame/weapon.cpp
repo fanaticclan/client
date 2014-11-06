@@ -366,14 +366,14 @@ namespace game
         loopi(len) if(projs[i].owner==owner) { projs.remove(i--); len--; }
     }
 
-    VARP(damageparticle, 0, 0, 1);
+    VARP(damageparticletext, 0, 0, 1);
 
     void damageeffect(int damage, fpsent *d, bool thirdperson)
     {
         vec p = d->o;
         p.z += 0.6f*(d->eyeheight + d->aboveeye) - d->eyeheight;
         if(blood) particle_splash(PART_BLOOD, damage/10, 1000, p, ~bloodcolor, bloodintensity); // Fanatic Edition
-        if(thirdperson && damageparticle) // Fanatic Edition
+        if(thirdperson && damageparticletext) // Fanatic Edition
         {
             defformatstring(ds)("%d", damage);
             particle_textcopy(d->abovehead(), ds, PART_TEXT, 2000, 0xFF4B19, 4.0f, -8);

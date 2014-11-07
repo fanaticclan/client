@@ -144,9 +144,9 @@
 <sub>`radar STR` Set custom radar texture;</sub><br />
 <sub>`radarteammatesdead 0|1` Enable or disable radar icons for dead players (own team);</sub><br />
 <sub>`radarteammatesplayerstarts 0|1` Enable or disable radar icons for playerstarts (own team);</sub><br />
+<sub>`riflarecolor RGB|HEX`</sub><br />
 <sub>`riflareduration iNT`</sub><br />
 <sub>`riflaresize FLOAT`</sub><br />
-<sub>`riflarecolor RGB|HEX`</sub><br />
 <sub>`rishotduration iNT`</sub><br />
 <sub>`rishotgravity iNT`</sub><br />
 <sub>`rishotsize FLOAT`</sub><br />
@@ -236,35 +236,27 @@
 
 <sub>> `on* [ action ]` Additional event hooks for CubeScript usage;</sub><br />
 
-<sub>`ondemostart [ ]`;</sub><br />
+<sub>`onconnect [$arg1]` Returns: clientnum;</sub><br />
+<sub>`ondamage [$arg1 $arg2 $arg3 $arg4]` Returns: actor->clientnum, target->clientnum, actor->gunselect, damage;</sub><br />
 <sub>`ondemoend [ ]`;</sub><br />
-
-<sub>`onattack [ ]`;</sub><br />
-<sub>`oncrouch [ ]`;</sub><br />
-<sub>`ondeathbyenemy [ ]`;</sub><br />
-<sub>`ondeathbyteammate [ ]`;</sub><br />
-<sub>`ondropflag [ ]`;</sub><br />
-<sub>`onflagfail [ ]`;</sub><br />
-<sub>`onflagscore [ ]`;</sub><br />
-<sub>`onfragenemy [ ]`;</sub><br />
-<sub>`onfragteammate [ ]`;</sub><br />
-<sub>`onjump [ ]`;</sub><br />
+<sub>`ondemostart [ ]`;</sub><br />
+<sub>`ondied [$arg1 $arg2 $arg3]` Returns actor->clientnum, victim->clientnum, actor->gunselect;</sub><br />
+<sub>`ondropflag [$arg1]` Returns: clientnum;</sub><br />
+<sub>`oneditmode [$arg1 $arg2]` Returns: clientnum, value;</sub><br />
+<sub>`ongamepausechange [$arg1 $arg2]` Returns: clientnum, value;</sub><br />
+<sub>`ongamespeedchange [$arg1 $arg2]` Returns: clientnum, value;</sub><br />
+<sub>`onintermision [ ]`;</sub><br />
+<sub>`onjumppad [$arg1 $arg2]` Returns: clientnum, jumppad;</sub><br />
+<sub>`onmapchange [$arg1]` Returns: mapname;</sub><br />
 <sub>`onmapstart [ ]`;</sub><br />
-<sub>`onresetflag [ ]`;</sub><br />
-<sub>`onrespawn [ ]`;</sub><br />
-<sub>`onreturnflag [ ]`;</sub><br />
-<sub>`ontakeflagenemy [ ]`;</sub><br />
-<sub>`ontakeflagteam [ ]`;</sub><br />
-<sub>`ontaunt [ ]`;</sub><br />
-
-<sub>> `on* [ action args ]` Additional event hooks for CubeScript usage with arguments;</sub><br />
-
-<sub>`onconnect = [$arg1 $arg2 $arg3]` Returns: clientnum, playermodel;</sub><br />
-<sub>`ondamage = [$arg1 $arg2 $arg3 $arg4]` Returns: actor->clientnum, target->clientnum, actor->gunselect, damage;</sub><br />
-<sub>`ondied = [$arg1 $arg2 $arg3]` Returns actor->clientnum, victim->clientnum, actor->gunselect;</sub><br />
-<sub>`onjumppad = [$arg1 $arg2]` Returns: clientnum, jumppad;</sub><br />
-<sub>`onmapchange = [$arg1]` Returns: mapname;</sub><br />
-<sub>`onteleport = [$arg1 $arg2 $arg3]` Returns clientnum, teleport, teledest;</sub><br />
+<sub>`onping [$arg1 $arg2]` Returns: clientnum, ping;</sub><br />
+<sub>`onresetflag [$arg1]` Returns: team;</sub><br />
+<sub>`onreturnflag [$arg1]` Returns: clientnum;</sub><br />
+<sub>`onscoreflag [$arg1 $arg2]` Returns: clientnum, team;</sub><br />
+<sub>`onservmsg [$arg1]` Returns: text;</sub><br />
+<sub>`onsuicide [$arg1]` Returns: clientnum;</sub><br />
+<sub>`ontakeflag [$arg1]` Returns: clientnum;</sub><br />
+<sub>`onteleport [$arg1 $arg2 $arg3]` Returns clientnum, teleport, teledest;</sub><br />
 
 #####₪ New Commands: History
 

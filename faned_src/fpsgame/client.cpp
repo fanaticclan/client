@@ -1964,7 +1964,6 @@ namespace game
                     defformatstring(str)("onconnect %d", d->clientnum);
                     execute(str);
                 }
-                if(autowhois) dowhois(d->clientnum);
                 break;
             }
 
@@ -1980,7 +1979,6 @@ namespace game
                         copystring(d->name, text, MAXNAMELEN+1);
                     }
                 }
-                if(autowhois) dowhois(d->clientnum);
                 break;
 
             case N_SWITCHMODEL:

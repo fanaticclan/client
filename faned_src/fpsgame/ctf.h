@@ -628,7 +628,15 @@ struct ctfclientmode : clientmode
             flag &f = flags[i];
             if(!f.owner && f.droptime && f.droploc.x < 0) continue;
             if(m_hold && f.spawnindex < 0) continue;
-            const char *flagname = m_hold && (!f.owner || lastmillis%1000 < 500) ? "flags/neutral" : (m_hold ? ctfteamflag(f.owner->team) : f.team)==ctfteamflag(player1->team) ? (!joinred ? "flags/blue" : "flags/red") : (!joinred ? "flags/red" : "flags/blue"); // Fanatic Edition
+            const char *flagname;
+            if(!joinred)
+            {
+                flagname = m_hold && (!f.owner || lastmillis%1000 < 500) ? "flags/neutral" : (m_hold ? ctfteamflag(f.owner->team) : f.team)==ctfteamflag(player1->team) ? "flags/blue" : "flags/red";
+            }
+            else
+            {
+                flagname = m_hold && (!f.owner || lastmillis%1000 < 500) ? "flags/neutral" : (m_hold ? ctfteamflag(f.owner->team) : f.team)==ctfteamflag(player1->team) ? "flags/red" : "flags/blue";
+            }
             float angle;
             vec pos = interpflagpos(f, angle);
             if(m_hold)
@@ -636,7 +644,7 @@ struct ctfclientmode : clientmode
                         pos, angle, 0,
                         MDL_GHOST | MDL_CULL_VFC | (f.droptime || f.owner ? MDL_LIGHT : 0),
                         NULL, NULL, 0, 0, 0.5f + 0.5f*(2*fabs(fmod(lastmillis/1000.0f, 1.0f) - 0.5f)));
-            rendermodel(!f.droptime && !f.owner ? &f.light : NULL, flagname, ANIM_MAPMODEL|ANIM_LOOP,
+                rendermodel(!f.droptime && !f.owner ? &f.light : NULL, flagname, ANIM_MAPMODEL|ANIM_LOOP,
                         pos, angle, 0,
                         MDL_DYNSHADOW | MDL_CULL_VFC | MDL_CULL_OCCLUDED | (f.droptime || f.owner ? MDL_LIGHT : 0),
                         NULL, NULL, 0, 0, 0.3f + (f.vistime ? 0.7f*min((lastmillis - f.vistime)/1000.0f, 1.0f) : 0.0f));
@@ -817,7 +825,11 @@ struct ctfclientmode : clientmode
         else if(strstr(ctfsoundset, "sauerenhanced")) playsound(S_SET_SE_FLAGDROP);
         else if(strstr(ctfsoundset, "bloodfrontier")) playsound(S_SET_BF_FLAGDROP);
         else if(strstr(ctfsoundset, "redeclipse")) playsound(S_SET_RE_FLAGDROP);
-        if(d == player1 && identexists("ondropflag")) execute("ondropflag");
+        if(identexists("ondropflag"))
+        {
+            defformatstring(str)("ondropflag %d", d->clientnum);
+            execute(str);
+        }
         // End: Fanatic Edition
     }
 
@@ -886,7 +898,11 @@ struct ctfclientmode : clientmode
         else if(strstr(ctfsoundset, "sauerenhanced")) playsound(S_SET_SE_FLAGRETURN);
         else if(strstr(ctfsoundset, "bloodfrontier")) playsound(S_SET_BF_FLAGRETURN);
         else if(strstr(ctfsoundset, "redeclipse")) playsound(S_SET_RE_FLAGRETURN);
-        if(d == player1 && identexists("onreturnflag")) execute("onreturnflag");
+        if(identexists("onreturnflag"))
+        {
+            defformatstring(str)("onreturnflag %d", d->clientnum);
+            execute(str);
+        }
         // End: Fanatic Edition
     }
 
@@ -918,7 +934,11 @@ struct ctfclientmode : clientmode
             else if(strstr(ctfsoundset, "sauerenhanced")) playsound(S_SET_SE_FLAGRESET);
             else if(strstr(ctfsoundset, "bloodfrontier")) playsound(S_SET_BF_FLAGRESET);
             else if(strstr(ctfsoundset, "redeclipse")) playsound(S_SET_RE_FLAGRESET);
-            if(identexists("onreturnflag")) execute("onresetflag");
+            if(identexists("onresetflag"))
+            {
+                defformatstring(str)("onresetflag %d", team);
+                execute(str);
+            }
             // End: Fanatic Edition
         }
     }
@@ -955,8 +975,11 @@ struct ctfclientmode : clientmode
         else if(strstr(ctfsoundset, "sauerenhanced")) playsound(S_SET_SE_FLAGSCORE);
         else if(strstr(ctfsoundset, "bloodfrontier")) playsound(S_SET_BF_FLAGSCORE);
         else if(strstr(ctfsoundset, "redeclipse")) playsound(S_SET_RE_FLAGSCORE);
-        if(team == ctfteamflag(player1->team) && identexists("onflagscore")) execute("onflagscore");
-        if(team != ctfteamflag(player1->team) && identexists("onflagfail")) execute("onflagfail");
+        if(identexists("onscoreflag"))
+        {
+            defformatstring(str)("onscoreflag %d %d", d->clientnum, team);
+            execute(str);
+        }
         // End: Fanatic Edition
         if(score >= FLAGLIMIT) conoutf(CON_GAMEINFO, "%s captured %d flags", teamcolor("your team", ctfflagteam(team), "the enemy team"), score);
     }
@@ -977,8 +1000,11 @@ struct ctfclientmode : clientmode
         else if(strstr(ctfsoundset, "sauerenhanced")) playsound(S_SET_SE_FLAGPICKUP);
         else if(strstr(ctfsoundset, "bloodfrontier")) playsound(S_SET_BF_FLAGPICKUP);
         else if(strstr(ctfsoundset, "redeclipse")) playsound(isteam(d->team, player1->team) ? S_SET_RE_FLAGPICKUPTEAM : S_SET_RE_FLAGPICKUPENEMY);
-        if(isteam(d->team, player1->team) != 0 && identexists("ontakeflagteam")) execute("ontakeflagteam");
-        if(isteam(d->team, player1->team) == 0 && identexists("ontakeflagenemy")) execute("ontakeflagenemy");
+        if(identexists("ontakeflag"))
+        {
+            defformatstring(str)("ontakeflag %d", d->clientnum);
+            execute(str);
+        }
         // End: Fanatic Edition
     }
 

@@ -1683,7 +1683,17 @@ namespace game
                     gamepaused = val;
                     player1->attacking = false;
                 }
-                if(a) conoutf("%s %s the game", colorname(a), val ? "paused" : "resumed"); 
+                // Start: Fanatic Edition
+                if(a)
+                {
+                    conoutf("%s %s the game", colorname(a), val ? "paused" : "resumed");
+                    if(identexists("ongamepausechange"))
+                    {
+                        defformatstring(str)("ongamepausechange %d %d", a->clientnum, val);
+                        execute(str);
+                    }
+                }
+                // End: Fanatic Edition
                 else conoutf("game is %s", val ? "paused" : "resumed");
                 break;
             }
@@ -1695,7 +1705,17 @@ namespace game
                 if(!demopacket) gamespeed = val;
                 extern int slowmosp;
                 if(m_sp && slowmosp) break;
-                if(a) conoutf("%s set gamespeed to %d", colorname(a), val);
+                // Start: Fanatic Edition
+                if(a)
+                {
+                    conoutf("%s set gamespeed to %d", colorname(a), val);
+                    if(identexists("ongamespeedchange"))
+                    {
+                        defformatstring(str)("ongamespeedchange %d %d", a->clientnum, val);
+                        execute(str);
+                    }
+                }
+                // End: Fanatic Edition
                 else conoutf("gamespeed is %d", val);
                 break;
             }
@@ -1941,9 +1961,10 @@ namespace game
                 d->playermodel = getint(p);
                 if(identexists("onconnect"))
                 {
-                    defformatstring(str)("onconnect %d %d", d->clientnum, d->playermodel);
+                    defformatstring(str)("onconnect %d", d->clientnum);
                     execute(str);
                 }
+                if(autowhois) dowhois(d->clientnum);
                 break;
             }
 
@@ -1959,6 +1980,7 @@ namespace game
                         copystring(d->name, text, MAXNAMELEN+1);
                     }
                 }
+                if(autowhois) dowhois(d->clientnum);
                 break;
 
             case N_SWITCHMODEL:
@@ -2375,6 +2397,13 @@ namespace game
             case N_CLIENTPING:
                 if(!d) return;
                 d->ping = getint(p);
+                // Start: Fanatic Edition
+                if(identexists("onping"))
+                {
+                    defformatstring(str)("onping %d %d", d->clientnum, d->ping);
+                    execute(str);
+                }
+                // End: Fanatic Edition
                 break;
 
             case N_TIMEUP:
@@ -2384,8 +2413,13 @@ namespace game
             case N_SERVMSG:
                 // Start: Fanatic Edition
                 getstring(text, p);
-                lua_N_SERVCMD(-1, text);
                 conoutf("%s", text);
+                lua_N_SERVCMD(-1, text);
+                if(identexists("onservmsg"))
+                {
+                    defformatstring(str)("onservmsg %s", text);
+                    execute(str);
+                }
                 // End: Fanatic Edition
                 break;
 
@@ -2410,8 +2444,12 @@ namespace game
                 demoplayback = on!=0;
                 player1->clientnum = getint(p);
                 gamepaused = false;
-                const char *alias = on ? "demostart" : "demoend";
-                if(identexists(alias)) execute(alias);
+                // Start: Fanatic Edition
+                const char *alias1 = on ? "demostart" : "demoend"; // Legacy
+                if(identexists(alias1)) execute(alias1);
+                const char *alias2 = on ? "ondemostart" : "ondemoend";
+                if(identexists(alias2)) execute(alias2);
+                // End: Fanatic Edition
                 break;
             }
 
@@ -2463,6 +2501,11 @@ namespace game
                     if(d->state==CS_DEAD) deathstate(d, true);
                 }
                 lua_N_EDITMODE(d->clientnum, val);
+                if(identexists("oneditmode"))
+                {
+                    defformatstring(str)("oneditmode %d %d", d->clientnum, val);
+                    execute(str);
+                }
                 // End: Fanatic Edition
                 break;
             }

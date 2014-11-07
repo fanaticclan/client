@@ -27,7 +27,6 @@ namespace game
         if(lastmillis-player1->lasttaunt<1000) return;
         player1->lasttaunt = lastmillis;
         addmsg(N_TAUNT, "rc", player1);
-        if(identexists("ontaunt")) execute("ontaunt");
     }
     COMMAND(taunt, "");
 
@@ -310,7 +309,6 @@ namespace game
                 loopi(NUMGUNS) if(i!=GUN_PISTOL && (player1->ammo[i] = savedammo[i]) > 5) player1->ammo[i] = max(player1->ammo[i]/3, 5);
             }
             if(playrespawnsound) playsound(S_RESPAWN); // Fanatic Edition
-            if(identexists("onrespawn")) execute("onrespawn"); // Fanatic Edition
         }
     }
 
@@ -375,7 +373,6 @@ namespace game
             player1->state = CS_DEAD;
             respawn();
         }
-        if(identexists("onattack")) execute("onattack");
     }
 
     void docrouch(int down)
@@ -394,7 +391,6 @@ namespace game
             playsound(S_CROUCHOUT);
         }
         player1->resetinterp();
-        if(identexists("oncrouch")) execute("oncrouch");
     }
     ICOMMAND(crouch, "D", (int *down), docrouch(*down));
 
@@ -410,7 +406,6 @@ namespace game
             respawn();
         }
         return player1->state!=CS_DEAD && !intermission;
-        if(identexists("onjump")) execute("onjump");
     }
     // End: Fanatic Edition
 
@@ -439,7 +434,6 @@ namespace game
 
     void damaged(int damage, fpsent *d, fpsent *actor, bool local)
     {
-        if(d == player1 && identexists("ondamage")) execute("ondamage");
         if(d == player1 && damagemotion && !inmotion && (actor->gunselect == GUN_RL || actor->gunselect == GUN_GL))
         {
             execute("_motionblur = $motionblur");
@@ -595,9 +589,14 @@ namespace game
             {
                 centerconsolespecies2 = 1;
                 centerconsoletime2 = totalmillis;
-                conoutf(contype, "\f2you suicided");
                 defformatstring(centerconsolestring)("\f2you suicided");
                 copystring(centerconsolemessage2, centerconsolestring);
+                conoutf(contype, "\f2you suicided");
+            }
+            if(identexists("onsuicide"))
+            {
+                defformatstring(str)("onsuicide %d", d->clientnum);
+                execute(str);
             }
         }
         else if(isteam(d->team, actor->team))
@@ -611,7 +610,6 @@ namespace game
                 defformatstring(centerconsolestring)("\f6%s %s your teammate %s", you, fragged, dname);
                 copystring(centerconsolemessage1, centerconsolestring);
                 conoutf(contype, "%s", centerconsolestring);
-                if(identexists("onfragteammate")) execute("onfragteammate");
 
                 if(autosaysorry)
                 {
@@ -627,7 +625,6 @@ namespace game
                 defformatstring(centerconsolestring)("\f6%s got %s by your teammate %s", you, fragged, aname);
                 copystring(centerconsolemessage2, centerconsolestring);
                 conoutf(contype, "%s", centerconsolestring);
-                if(identexists("ondeathbyteammate")) execute("ondeathbyteammate");
                 
                 if(autosaynp)
                 {
@@ -651,7 +648,6 @@ namespace game
                 defformatstring(centerconsolestring)("\f2%s got %s by %s", you, fragged, aname);
                 copystring(centerconsolemessage2, centerconsolestring);
                 conoutf(contype, "%s", centerconsolestring);
-                if(identexists("ondeathbyenemy")) execute("ondeathbyenemy");
             }
             else
             {
@@ -664,7 +660,6 @@ namespace game
                     centerconsoletime1 = totalmillis;
                     defformatstring(centerconsolestring)("\f2%s %s %s", you, fragged, dname);
                     copystring(centerconsolemessage1, centerconsolestring);
-                    if(identexists("onfragenemy")) execute("onfragenemy");
 
                     if(d->timeinair)
                     {
@@ -907,9 +902,9 @@ namespace game
         showscores(false);
         disablezoom();
         lasthit = 0;
-        if(identexists("mapstart")) execute("mapstart");
 
         // Start: Fanatic Edition
+        if(identexists("mapstart")) execute("mapstart"); // Legacy
         if(identexists("onmapstart")) execute("onmapstart");
         player1->crouched = false;
         // End: Fanatic Edition

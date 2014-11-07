@@ -309,7 +309,6 @@ enum
     // Start: Fanatic Edition
     PART_TELE,
     PART_BUBBLE,
-    PART_FLAME1, PART_FLAME2, PART_FLAME3, PART_FLAME4,
     // End: Fanatic Edition
     PART_LENS_FLARE
 };

@@ -862,10 +862,6 @@ static partrenderer *parts[] =
     // Start: Fanatic Edition
     new quadrenderer("faned/particles/tele.png", PT_PART|PT_GLARE),
     new quadrenderer("faned/particles/bubble.jpg", PT_PART|PT_GLARE),
-    new quadrenderer("faned/particles/flame1.png", PT_PART|PT_FLIP),
-    new quadrenderer("faned/particles/flame2.png", PT_PART|PT_FLIP),
-    new quadrenderer("faned/particles/flame3.png", PT_PART|PT_FLIP),
-    new quadrenderer("faned/particles/flame4.png", PT_PART|PT_FLIP),
     // End: Fanatic Edition
     &flares                                                                                        // lens flares - must be done last
 };

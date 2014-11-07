@@ -32,9 +32,6 @@ VARP(ritraillightning, 0, 0, 1);
 VARP(ritrailsmoke, 0, 1, 1);
 VARP(ritrailspin, 0, 0, 1);
 
-HVARP(rlexplosioncolor, 0, 0xFF8080, 0xFFFFFF);
-HVARP(glexplosioncolor, 0, 0x80FFFF, 0xFFFFFF);
-
 VARP(shotsparks, 0, 1, 1);
 
 HVARP(lasercolor, 0, 0x222222, 0xFFFFFF);
@@ -496,7 +493,7 @@ namespace game
         }
         particle_splash(PART_SMOKE, 5, 2500, v, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 12.0f, 50, 500);
 
-        particle_fireball(v, guns[gun].exprad, gun!=GUN_GL ? PART_EXPLOSION : PART_EXPLOSION_BLUE, gun!=GUN_GL ? -1 : int((guns[gun].exprad-4.0f)*15), gun!=GUN_GL ? rlexplosioncolor : glexplosioncolor, 4.0f);
+        particle_fireball(v, guns[gun].exprad, gun!=GUN_GL ? PART_EXPLOSION : PART_EXPLOSION_BLUE, gun!=GUN_GL ? -1 : int((guns[gun].exprad-4.0f)*15), gun!=GUN_GL ? 0xFF8080 : 0x80FFFF, 4.0f);
         // End: Fanatic Edition
         if(gun == GUN_RL) adddynlight(v, 1.15f*guns[gun].exprad, vec(2, 1.5f, 1), 700, 100, 0, guns[gun].exprad/2, vec(1, 0.75f, 0.5f));
         else if(gun == GUN_GL) adddynlight(v, 1.15f*guns[gun].exprad, vec(0.5f, 1.5f, 2), 600, 100, 0, 8, vec(0.25f, 1, 1));

@@ -2512,13 +2512,13 @@ VARP(showbuildversion, 0, 1, 1);
 string buildname =  "Cube 2: Sauerbraten - Fanatic Edition";
 ICOMMAND(getbuildname, "", (), result(buildname));
 
-string buildrevision = "5034";
+string buildrevision = "5035";
 ICOMMAND(getbuildrevision, "", (), result(buildrevision));
 
 string buildurl = "https://github.com/fanaticclan/client";
 ICOMMAND(getbuildurl, "", (), result(buildurl));
 
-string buildversion = "20141106094344-DEV";
+string buildversion = "20141107143720-DEV";
 ICOMMAND(getbuildversion, "", (), result(buildversion));
 
 extern int sehud;

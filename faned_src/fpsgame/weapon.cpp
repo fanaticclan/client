@@ -6,19 +6,19 @@ VARP(blood, 0, 1, 1);
 HVARP(bloodcolor, 0, 0x9F0000, 0xFFFFFF);
 FVARP(bloodintensity, 0, 5.0f, INT_MAX);
 
-HVARP(sgshotcolor, 0, 0xFF7700, 0xFFFFFF);
+HVARP(sgshotcolor, 0, 0xFF6600, 0xFFFFFF);
 VARP(sgshotduration, 1, 100, 10000);
 FVARP(sgshotsize, 0, 0.24f, 50.0f);
 
-HVARP(cgshotcolor, 0, 0xFF7700, 0xFFFFFF);
+HVARP(cgshotcolor, 0, 0xFF6600, 0xFFFFFF);
 VARP(cgshotduration, 1, 250, 10000);
 FVARP(cgshotsize, 0, 0.24f, 50.0f);
 
-HVARP(pishotcolor, 0, 0xFF7700, 0xFFFFFF);
+HVARP(pishotcolor, 0, 0xFF6600, 0xFFFFFF);
 VARP(pishotduration, 1, 250, 10000);
 FVARP(pishotsize, 0, 0.24f, 50.0f);
 
-HVARP(riflarecolor, 0, 0xFF7700, 0xFFFFFF);
+HVARP(riflarecolor, 0, 0xFF6600, 0xFFFFFF);
 VARP(riflareduration, 1, 250, 10000);
 FVARP(riflaresize, 0, 0.24f, 50.0f);
 
@@ -366,14 +366,12 @@ namespace game
         loopi(len) if(projs[i].owner==owner) { projs.remove(i--); len--; }
     }
 
-    VARP(damageparticletext, 0, 0, 1);
-
     void damageeffect(int damage, fpsent *d, bool thirdperson)
     {
         vec p = d->o;
         p.z += 0.6f*(d->eyeheight + d->aboveeye) - d->eyeheight;
         if(blood) particle_splash(PART_BLOOD, damage/10, 1000, p, ~bloodcolor, bloodintensity); // Fanatic Edition
-        if(thirdperson && damageparticletext) // Fanatic Edition
+        if(thirdperson)
         {
             defformatstring(ds)("%d", damage);
             particle_textcopy(d->abovehead(), ds, PART_TEXT, 2000, 0xFF4B19, 4.0f, -8);

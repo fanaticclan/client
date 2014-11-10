@@ -1337,11 +1337,7 @@ namespace game
             else return false;
         }
         else if(b->state == CS_SPECTATOR) return true;
-        if(m_ctf || m_collect)
-        {
-            if(a->flags > b->flags) return true;
-            if(a->flags < b->flags) return false;
-        }
+
         if(a->frags > b->frags) return true;
         if(a->frags < b->frags) return false;
         
@@ -1460,13 +1456,11 @@ namespace game
             glPushMatrix();
             glScalef(0.7, 0.7, 1);
 
-            int iplayers = 0;
-            loopv(players) iplayers++;
-            players.sort(playerslist);
-
             int iplayerssorted = 0;
             loopv(players)
             {
+                players.sort(playerslist);
+
                 int pw, ph, th, fw, fh;
                 text_bounds("  ", pw, ph);
                 th = max(th, ph);

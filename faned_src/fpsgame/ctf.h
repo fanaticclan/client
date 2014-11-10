@@ -8,7 +8,7 @@ SVARP(ctfsoundset, "redeclipse");
 
 VARP(compass, 0, 1, 1);
 
-SVARP(radar, "sauerenhanced");
+SVARP(radar, "tesseract");
 // End: Fanatic Edition
 #ifdef SERVMODE
 VAR(ctftkpenalty, 0, 1, 1);
@@ -647,7 +647,7 @@ struct ctfclientmode : clientmode
                 rendermodel(!f.droptime && !f.owner ? &f.light : NULL, flagname, ANIM_MAPMODEL|ANIM_LOOP,
                         pos, angle, 0,
                         MDL_DYNSHADOW | MDL_CULL_VFC | MDL_CULL_OCCLUDED | (f.droptime || f.owner ? MDL_LIGHT : 0),
-                        NULL, NULL, 0, 0, 0.3f + (f.vistime ? 0.7f*min((lastmillis - f.vistime)/1000.0f, 1.0f) : 0.0f));
+                        NULL, NULL, 0, 0, 0.5f + 0.5f*(2*fabs(fmod(lastmillis/1000.0f, 1.0f) - 0.5f)));
 
             if(m_protect && canaddparticles() && f.owner && insidebase(f, f.owner->feetpos()))
             {

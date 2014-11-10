@@ -106,7 +106,6 @@
 <sub>`crouch` Bind it to a key for experimental crouching (Note: Other players will **not** see you crouched.);</sub><br />
 <sub>`ctfsoundset "STR"` Set the desired soundset for ctf modes;</sub><br />
 <sub>`damagemotion 0|1` Enable or disable special effects after getting damage from explosives;</sub><br />
-<sub>`damageparticletext 0|1` Enable or disable the damage information particle above players heads;</sub><br />
 <sub>`date %FORMAT` Returns the current date/time in given format; example: `echo (date %Y-%m-%d %H:%M:%S)`;</sub><br />
 <sub>`deathcamera 0|1` Enable or disable experimental actor following after death (Note: Other players will **not** see you spectating.);</sub><br />
 <sub>`deathpanicscreen 0|1` Enable or disable the deathpanic eyeveins screen;</sub><br />

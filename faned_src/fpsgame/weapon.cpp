@@ -338,7 +338,7 @@ namespace game
         int offsetmillis;
         int id;
         entitylight light;
-        int pc; // Fanatic Edition
+        // FIXME: int pc; // Fanatic Edition
     };
     vector<projectile> projs;
 
@@ -645,7 +645,7 @@ namespace game
                     else regular_particle_splash(PART_SMOKE, 2, 400, pos, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 2.4f, 50, -20);
                     if(lookupmaterial(pos) == MAT_WATER) regular_particle_splash(PART_BUBBLE, 4, 500, pos, 0xFFFFFF, 0.5f, 25, 500);
                     else particle_flare(pos, pos, 1, PART_MUZZLE_FLASH3, 0xFFFFFF, 1.0f + rndscale(5), NULL);
-                    p.pc = playsound(S_ROCKET, &pos, NULL, 0, -1, 1, p.pc, -1, 3000);
+                    // FIXME: p.pc = playsound(S_ROCKET, &pos, NULL, 0, -1, 1, p.pc, -1, 3000);
                     // End: Fanatic Edition
                 }
             }
@@ -655,7 +655,7 @@ namespace game
                     addmsg(N_EXPLODE, "rci3iv", p.owner, lastmillis-maptime, p.gun, p.id-maptime,
                             hits.length(), hits.length()*sizeof(hitmsg)/sizeof(int), hits.getbuf());
                 projs.remove(i--);
-                stopsound(S_ROCKET, p.pc, 3000); // Fanatic Edition
+                // FIXME: stopsound(S_ROCKET, p.pc, 3000); // Fanatic Edition
             }
             else p.o = v;
         }

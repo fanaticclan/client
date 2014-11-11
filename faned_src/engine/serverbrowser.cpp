@@ -260,25 +260,14 @@ struct pingattempts
 
 enum { UNRESOLVED = 0, RESOLVING, RESOLVED };
 
-struct serverinfo : pingattempts
+struct serverinfo : pingattempts, serverinfodata // Fanatic Edition
 {
-    enum 
-    { 
-        WAITING = INT_MAX,
-
-        MAXPINGS = 3
-    };
-
-    string name, map, sdesc;
-    int port, numplayers, resolved, ping, lastping, nextping;
+    int resolved, lastping, nextping; // Fanatic Edition
     int pings[MAXPINGS];
-    vector<int> attr;
-    ENetAddress address;
     bool keep;
     const char *password;
 
-    serverinfo()
-        : port(-1), numplayers(0), resolved(UNRESOLVED), keep(false), password(NULL)
+    serverinfo() : resolved(UNRESOLVED), keep(false), password(NULL) // Fanatic Edition
     {
         name[0] = map[0] = sdesc[0] = '\0';
         clearpings();
@@ -357,6 +346,46 @@ vector<serverinfo *> servers;
 ENetSocket pingsock = ENET_SOCKET_NULL;
 int lastinfo = 0;
 
+// Start: Fanatic Edition
+vector<serverinfodata *> getservers()
+{
+    vector<serverinfodata *> result;
+    loopv(servers)
+    {
+        serverinfodata* d = static_cast<serverinfodata*>(servers[i]);
+        result.add(d);
+    }
+    return result;
+}
+
+void saveservergameinfo(ENetAddress address, void *pdata)
+{
+    loopv(servers)
+    {
+        serverinfo *s = servers[i];
+        if(s->address.host == address.host && s->address.port == address.port)
+        {
+            s->gameinfo = pdata;
+            return;
+        }
+    }
+    cleangameinfo(pdata);
+}
+
+void* getservergameinfo(ENetAddress address)
+{
+    loopv(servers)
+    {
+        serverinfo *s = servers[i];
+        if(s->address.host == address.host && s->address.port == address.port)
+        {
+            return s->gameinfo;
+        }
+    }
+    return NULL;
+}
+// End: Fanatic Edition
+
 static serverinfo *newserver(const char *name, int port, uint ip = ENET_HOST_ANY)
 {
     serverinfo *si = new serverinfo;
@@ -370,11 +399,9 @@ static serverinfo *newserver(const char *name, int port, uint ip = ENET_HOST_ANY
     {
         delete si;
         return NULL;
-
     }
 
     servers.add(si);
-
     return si;
 }
 
@@ -442,6 +469,7 @@ void pingservers()
         if(si.address.host == ENET_HOST_ANY) continue;
         buildping(buf, ping, si);
         enet_socket_send(pingsock, &si.address, &buf, 1);
+        game::requestgameinfo(si.address); // Fanatic Edition
         
         si.checkdecay(servpingdecay);
     }
@@ -452,6 +480,7 @@ void pingservers()
         address.port = server::laninfoport();
         buildping(buf, ping, lanpings);
         enet_socket_send(pingsock, &address, &buf, 1);
+        game::requestgameinfo(address); // Fanatic Edition
     }
     lastinfo = totalmillis;
 }
@@ -560,9 +589,35 @@ void refreshservers()
 }
 
 serverinfo *selectedserver = NULL;
+bool ispreview = false; // Fanatic Edition
+VARP(showserverpreview, 0, 1, 1); // Fanatic Edition
 
 const char *showservers(g3d_gui *cgui, uint *header, int pagemin, int pagemax)
 {
+    // Start: Fanatic Edition
+    if(ispreview)
+    {
+        cgui->allowautotab(false);
+        int cmd = game::showserverpreview(cgui);
+        switch(cmd)
+        {
+            case 0:
+                return NULL;
+            case 1:
+                ispreview = false;
+                cgui->allowautotab(true);
+                return "connectselected";
+            case -1:
+                ispreview = false;
+                cgui->allowautotab(true);
+                selectedserver = NULL;
+                return NULL;
+        }
+        cgui->allowautotab(true);
+        return NULL;
+    }
+    // End: Fanatic Edition
+
     refreshservers();
     if(servers.empty())
     {
@@ -585,7 +640,7 @@ const char *showservers(g3d_gui *cgui, uint *header, int pagemin, int pagemax)
                 serverinfo &si = *servers[j];
                 const char *sdesc = si.sdesc;
                 if(si.address.host == ENET_HOST_ANY) sdesc = "[unknown host]";
-                else if(si.ping == serverinfo::WAITING) sdesc = "[waiting for response]";
+                else if(si.ping == serverinfodata::WAITING) sdesc = "[waiting for response]"; // Fanatic Edition
                 if(game::serverinfoentry(cgui, i, si.name, si.port, sdesc, si.map, sdesc == si.sdesc ? si.ping : -1, si.attr, si.numplayers))
                     sc = &si;
             }
@@ -596,6 +651,17 @@ const char *showservers(g3d_gui *cgui, uint *header, int pagemin, int pagemax)
     }
     if(selectedserver || !sc) return NULL;
     selectedserver = sc;
+
+    // Start: Fanatic Edition
+    if(showserverpreview)
+    {
+        game::setserverpreview(sc->name, sc->port);
+        cgui->allowautotab(false);
+        ispreview = true;
+        return NULL;
+    }
+    // End: Fanatic Edition
+
     return "connectselected";
 }
 
@@ -607,6 +673,23 @@ void connectselected()
 }
 
 COMMAND(connectselected, "");
+
+// Start: Fanatic Edition
+void connectserver(const char* host, int port)
+{
+    loopv(servers)
+    {
+        serverinfo *s = servers[i];
+        if(!strcmp(s->name, host) && (s->port = port))
+        {
+            selectedserver = s;
+            connectselected();
+            return;
+        }
+    }
+    selectedserver = NULL;
+}
+// End: Fanatic Edition
 
 void clearservers(bool full = false)
 {
@@ -693,6 +776,17 @@ void initservers()
     selectedserver = NULL;
     if(autoupdateservers && !updatedservers) updatefrommaster();
 }
+
+// Start: Fanatic Edition
+void forceinitservers()
+{
+    if(!updatedservers)
+    {
+        selectedserver = NULL;
+        updatefrommaster();
+    }
+}
+// End: Fanatic Edition
 
 ICOMMAND(addserver, "sis", (const char *name, int *port, const char *password), addserver(name, *port, password[0] ? password : NULL));
 ICOMMAND(keepserver, "sis", (const char *name, int *port, const char *password), addserver(name, *port, password[0] ? password : NULL, true));

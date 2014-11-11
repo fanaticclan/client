@@ -1754,10 +1754,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
         }
         else if(!water && game::allowmove(pl)) d.mul((pl->move && !pl->strafe ? 1.3f : 1.0f) * (pl->physstate < PHYS_SLOPE ? 1.3f : 1.0f));
     }
-
-    if(game::player1->crouched == true) d.mul(velocity - 0.7f);
-    else d.mul(velocity);
-
+    d.mul(velocity);
     float fric = water && !floating ? 20.0f : (pl->physstate >= PHYS_SLOPE || floating ? 6.0f : 30.0f);
     pl->vel.lerp(d, pl->vel, pow(1 - 1/fric, curtime/20.0f));
 }

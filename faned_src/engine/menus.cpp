@@ -494,7 +494,6 @@ void guikeyfield(char *var, int *maxlength, char *onchange)
 
 //use text<action> to do more...
 
-
 void guilist(uint *contents)
 {
     if(!cgui) return;
@@ -569,6 +568,17 @@ void guiservers(uint *header, int *pagemin, int *pagemax)
     }
 }
 
+// Start: Fanatic Edition
+void guiplayers(uint* name)
+{
+    extern void showplayersgui(g3d_gui *cgui, uint *name);
+    if(cgui)
+    {
+        showplayersgui(cgui, name);
+    }
+}
+// End: Fanatic Edition
+
 void notifywelcome()
 {
     if(guiserversmenu)
@@ -582,6 +592,7 @@ COMMAND(newgui, "ssss");
 COMMAND(guibutton, "sss");
 COMMAND(guitext, "ss");
 COMMAND(guiservers, "eii");
+COMMAND(guiplayers, "e"); // Fanatic Edition
 ICOMMAND(cleargui, "i", (int *n), intret(cleargui(*n)));
 COMMAND(showgui, "s");
 COMMAND(hidegui, "s");

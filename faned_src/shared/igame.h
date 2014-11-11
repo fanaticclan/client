@@ -54,6 +54,7 @@ namespace game
     // End: Fanatic Edition
     extern void loadconfigs();
 
+    extern void updateextinfo(); // Fanatic Edition
     extern void updateworld();
     extern void initclient();
     extern void physicstrigger(physent *d, bool local, int floorlevel, int waterlevel, int material = 0);
@@ -83,7 +84,7 @@ namespace game
     extern int clipconsole(int w, int h);
     extern void g3d_gamemenus();
     extern const char *defaultcrosshair(int index);
-    extern int selectcrosshair(float &r, float &g, float &b, int &w, int &h);    // FANATIC EDITION
+    extern int selectcrosshair(float &r, float &g, float &b, int &w, int &h); // Fanatic Edition
     extern void lighteffects(dynent *d, vec &color, vec &dir);
     extern void setupcamera();
     extern bool detachcamera();
@@ -95,6 +96,12 @@ namespace game
     extern void serverinfoendcolumn(g3d_gui *g, int i);
     extern bool serverinfoentry(g3d_gui *g, int i, const char *name, int port, const char *desc, const char *map, int ping, const vector<int> &attr, int np);
     extern bool needminimap();
+
+    // Start: Fanatic Edition
+    extern void requestgameinfo(ENetAddress address);
+    extern void setserverpreview(const char *servername, int serverport);
+    extern int showserverpreview(g3d_gui *g);
+    // End: Fanatic Edition
 } 
  
 namespace server

@@ -148,8 +148,8 @@ namespace game
             string hostname;
             if(enet_address_get_host_ip(address, hostname, sizeof(hostname)) >= 0)
             {
-            if(servinfo[0]) g.titlef("%.25s", 0x50CFE5, NULL, servinfo);
-            else g.titlef("%s:%d", 0x50CFE5, NULL, hostname, address->port);
+            if(servinfo[0]) g.titlef("%.25s", 0xFFFFFF, NULL, servinfo);
+            else g.titlef("%s:%d", 0xFFFFFF, NULL, hostname, address->port);
             }
         }
      
@@ -208,8 +208,7 @@ namespace game
             if(sg.team && m_teammode)
             {
                 g.pushlist();
-                g.background(bgcolor, numgroups>1 ? 3 : 5);
-                g.strut(1);
+                g.strut(2);
                 g.poplist();
             }
 
@@ -222,11 +221,13 @@ namespace game
                     g.pushlist();
                     g.background(bgcolor, numgroups>1 ? 3 : 5);
                 }
+
                 const playermodelinfo &mdl = getplayermodelinfo(o);
                 const char *icon;
                 if(!joinred) { icon = sg.team && m_teammode ? (isteam(player1->team, sg.team) ? mdl.blueicon : mdl.redicon) : mdl.ffaicon; }
                 else { icon = sg.team && m_teammode ? (isteam(player1->team, sg.team) ? mdl.redicon : mdl.blueicon) : mdl.ffaicon; }
                 g.text("", 0, icon);
+
                 if(o==player1 && showhighlight && (multiplayer(false) || demoplayback || players.length() > 1)) g.poplist();
             });
             g.poplist();
@@ -235,8 +236,10 @@ namespace game
             {
                 g.pushlist(); // vertical
     
-                if(sg.score>=10000) g.textf("%s: WIN", fgcolor, NULL, sg.team);
-                else g.textf("%s: %d", fgcolor, NULL, sg.team, sg.score);
+                if(sg.score>=10000) g.titlef("%s: WIN", 0xFFFFDD, NULL, sg.team);
+                else g.titlef("%s: %d", 0xFFFFDD, NULL, sg.team, sg.score);
+    
+                g.separator();
     
                 g.pushlist(); // horizontal
             }
@@ -258,12 +261,12 @@ namespace game
 
             g.space(1);
 
-            if(showflags && cmode)
+            if(showflags && (m_ctf || m_collect))
             {
                 g.pushlist();
                 g.strut(5);
-                g.text("flags", fgcolor);
-                loopscoregroup(o, g.textf("%d", 0xFFFFDD, NULL, o->flags));
+                g.text(m_ctf ? "flags" : "skulls", fgcolor);
+                loopscoregroup(o, g.textf("%d", 0xFFFFDD, NULL, player1->clientnum == -1 ? o->flags : o->extdata.data.flags));
                 g.poplist();
             }
 
@@ -272,7 +275,7 @@ namespace game
                 g.pushlist();
                 g.strut(5);
                 g.text("frags", fgcolor);
-                loopscoregroup(o, g.textf("%d", 0xFFFFDD, NULL, o->frags));
+                loopscoregroup(o, g.textf("%d", 0xFFFFDD, NULL, player1->clientnum == -1 ? o->frags : o->extdata.data.frags));
                 g.poplist();
             }
 
@@ -281,7 +284,7 @@ namespace game
                 g.pushlist();
                 g.text("deaths", fgcolor);
                 g.strut(6);
-                loopscoregroup(o, g.textf("%d", 0xFFFFDD, NULL, o->deaths));
+                loopscoregroup(o, g.textf("%d", 0xFFFFDD, NULL, player1->clientnum == -1 ? o->deaths : o->extdata.data.deaths));
                 g.poplist();
             }
 
@@ -292,7 +295,9 @@ namespace game
                 g.strut(5);
                 loopv(sg.players)
                 {
-                    float kpd =  float(sg.players[i]->frags) / max(float(sg.players[i]->deaths), 1.0f);
+                    float kpd;
+                    if(player1->clientnum == -1) { kpd = float(sg.players[i]->frags)/max(float(sg.players[i]->deaths), 1.0f); }
+                    else { kpd = float(sg.players[i]->extdata.data.frags)/max(float(sg.players[i]->extdata.data.deaths), 1.0f); }
                     g.textf("%4.2f", 0xFFFFDD, NULL, kpd);
                 }
                 g.poplist();
@@ -303,7 +308,7 @@ namespace game
                 g.pushlist();
                 g.text("acc", fgcolor);
                 g.strut(5);
-                loopscoregroup(o, g.textf("%d%%", 0xFFFFDD, NULL, (o->totaldamage*100)/max(o->totalshots, 1)));
+                loopscoregroup(o, g.textf("%d%%", 0xFFFFDD, NULL, player1->clientnum == -1 ? (o->totaldamage*100)/max(o->totalshots, 1) : o->extdata.data.acc));
                 g.poplist();
             }
 
@@ -359,21 +364,12 @@ namespace game
 
         if(showspectators && spectators.length())
         {
-            g.separator();
-
-            g.pushlist();
-
             g.space(1);
-
-            g.text("spectators:", fgcolor);
-            g.poplist();
-
             g.pushlist();
 
-            g.space(1);
-
             g.pushlist();
-            g.text("name", fgcolor);
+            g.text("spectator", fgcolor, " ");
+            g.strut(5);
             loopv(spectators) 
             {
                 fpsent *o = spectators[i];

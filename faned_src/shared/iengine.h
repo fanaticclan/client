@@ -556,3 +556,50 @@ extern void g3d_cursorpos(float &x, float &y);
 extern void g3d_resetcursor();
 extern void g3d_limitscale(float scale);
 
+// Start: Fanatic Edition
+extern void cleangameinfo(void* p);
+
+struct serverinfodata
+{
+    enum
+    {
+        WAITING = INT_MAX,
+        MAXPINGS = 3
+    };
+
+    string name, map, sdesc;
+    int ping, port, numplayers;
+    ENetAddress address;
+    vector<int> attr;
+    void* gameinfo;
+
+    serverinfodata()
+    {
+        name[0] = map[0] = sdesc[0] = '\0';
+        ping = WAITING;
+        port = -1;
+        numplayers = 0;
+        address.host =  ENET_HOST_ANY;
+        address.port =  ENET_PORT_ANY;
+        gameinfo = NULL;
+    }
+
+    ~serverinfodata()
+    {
+        if(gameinfo) cleangameinfo(gameinfo);
+    }
+
+    bool iswaiting()
+    {
+        return ping == WAITING;
+    }
+};
+
+extern void saveservergameinfo(ENetAddress address, void *pdata);
+extern void* getservergameinfo(ENetAddress address);
+extern void forceinitservers();
+extern void refreshservers();
+extern void connectserver(const char* host, int port);
+extern vector<serverinfodata *> getservers();
+// End: Fanatic Edition
+

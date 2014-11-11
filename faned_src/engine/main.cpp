@@ -1413,6 +1413,7 @@ int main(int argc, char **argv)
         tryedit();
 
         if(lastmillis) game::updateworld();
+        game::updateextinfo();  // Fanatic Edition
 
         checksleep(lastmillis);
 

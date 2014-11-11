@@ -236,9 +236,6 @@ enum
 
     S_HIT,
 
-    S_CROUCHIN,
-    S_CROUCHOUT,
-
     S_NEARMISS1,
     S_NEARMISS2,
     S_NEARMISS3,
@@ -585,6 +582,376 @@ struct fpsstate
     }
 };
 
+// Start: Fanatic Edition
+
+#define MAXTEAMS 128
+#define MAXSERVSTRING 100
+
+struct serverdata
+{
+    int ping;
+    int nclients;
+    int mode;
+    int timelimit;
+    int maxclients;
+    int access;
+    int gamepaused;
+    int gamespeed;
+    char servname[MAXSERVSTRING];
+    char description[MAXSERVSTRING];
+    serverdata()
+    {
+        ping = 0;
+        nclients = 0;
+        mode = 0;
+        timelimit = 0;
+        maxclients = 0;
+        access = 0;
+        gamepaused = 0;
+        gamespeed = 0;
+        servname[0] = 0;
+        description[0] = 0;
+    }
+    void reset()
+    {
+        ping = 0;
+        nclients = 0;
+        mode = 0;
+        timelimit = 0;
+        maxclients = 0;
+        access = 0;
+        gamepaused = 0;
+        gamespeed = 0;
+        servname[0] = 0;
+        description[0] = 0;
+    }
+    void update(struct serverdata& ndata)
+    {
+        ping = ndata.ping;
+        nclients = ndata.nclients;
+        mode = ndata.mode;
+        timelimit = ndata.timelimit;
+        maxclients = ndata.maxclients;
+        access = ndata.access;
+        gamepaused = ndata.gamepaused;
+        gamespeed = ndata.gamespeed;
+        strncpy(servname, ndata.servname, MAXSERVSTRING-1);
+        servname[MAXSERVSTRING-1] = 0;
+        strncpy(description, ndata.description, MAXSERVSTRING-1);
+        description[MAXSERVSTRING-1] = 0;
+    }
+};
+
+#define MAXEXTTEAMLENGHT 5
+
+struct teamdata
+{
+    char teamname[MAXEXTTEAMLENGHT];
+    int score;
+    int bases;
+    teamdata()
+    {
+        teamname[0] = 0;
+        score = 0;
+        bases = 0;
+    }
+    void update(const struct teamdata& ndata)
+    {
+        strncpy(teamname, ndata.teamname, MAXEXTTEAMLENGHT-1);
+        teamname[MAXEXTTEAMLENGHT-1] = 0;
+        score = ndata.score;
+        bases = ndata.bases;
+    }
+    teamdata(const struct teamdata& ndata)
+    {
+        update(ndata);
+    }
+};
+
+struct teamsinfo
+{
+    int notteammode;
+    int gamemode;
+    int timeleft;
+    int nteams;
+    struct teamdata teams[MAXTEAMS];
+    teamsinfo()
+    {
+        notteammode = 0;
+        gamemode = 0;
+        timeleft = 0;
+        nteams = 0;
+    }
+    void update(const struct teamsinfo& ndata)
+    {
+        notteammode = ndata.notteammode;
+        gamemode = ndata.gamemode;
+        timeleft = ndata.timeleft;
+        nteams = ndata.nteams;
+        loopi(ndata.nteams)
+        {
+            teams[i].update(ndata.teams[i]);
+        }
+    }
+    teamsinfo(const struct teamsinfo& ndata)
+    {
+        update(ndata);
+    }
+    void reset()
+    {
+        notteammode = 0;
+        gamemode = 0;
+        timeleft = 0;
+        nteams = 0;
+    }
+    void addteam(struct teamdata &td)
+    {
+        if(nteams>=MAXTEAMS) return;
+        teams[nteams].update(td);
+        nteams++;
+    }
+};
+
+#define MAXEXTNAMELENGHT 16
+
+struct extplayerdata
+{
+    int cn;
+    int ping;
+    char name[MAXEXTNAMELENGHT];
+    char team[MAXEXTTEAMLENGHT];
+    int frags;
+    int flags;
+    int deaths;
+    int teamkills;
+    int acc;
+    int health;
+    int armour;
+    int gunselect;
+    int privilege;
+    int state;
+    int lastseen;
+    extplayerdata()
+    {
+        cn = 0;
+        ping = 0;
+        name[0] = 0;
+        team[0] = 0;
+        frags = 0;
+        flags = 0;
+        deaths = 0;
+        teamkills = 0;
+        acc = 0;
+        health = 0;
+        armour = 0;
+        gunselect = 0;
+        privilege = 0;
+        state = 0;
+        lastseen = totalmillis;
+    }
+    void reset() {
+        cn = 0;
+        ping = 0;
+        name[0] = 0;
+        team[0] = 0;
+        frags = 0;
+        flags = 0;
+        deaths = 0;
+        teamkills = 0;
+        acc = 0;
+        health = 0;
+        armour = 0;
+        gunselect = 0;
+        privilege = 0;
+        state = 0;
+        lastseen = totalmillis;
+    }
+    void update(const struct extplayerdata& ndata)
+    {
+        cn = ndata.cn;
+        ping = ndata.ping;
+        strncpy(name, ndata.name, MAXEXTNAMELENGHT-1);
+        name[MAXEXTNAMELENGHT-1] = 0;
+        strncpy(team, ndata.team, MAXEXTTEAMLENGHT-1);
+        team[MAXEXTTEAMLENGHT-1] = 0;
+        frags = ndata.frags;
+        flags = ndata.flags;
+        deaths = ndata.deaths;
+        teamkills = ndata.teamkills;
+        acc = ndata.acc;
+        health = ndata.health;
+        armour = ndata.armour;
+        gunselect = ndata.gunselect;
+        privilege = ndata.privilege;
+        state = ndata.state;
+        lastseen = totalmillis;
+    }
+    extplayerdata(const struct extplayerdata& ndata)
+    {
+        update(ndata);
+    }
+};
+
+#define MAXPREVIEWPLAYERS 128
+#define SERVUPDATEINTERVAL 3000
+#define SERVUPDATETEAMGAP 500
+
+struct serverpreviewdata
+{
+    struct serverdata sdata;
+    struct extplayerdata players[MAXPREVIEWPLAYERS];
+    int nplayers;
+    struct teamsinfo tinfo;
+    ENetAddress servaddress;
+    bool isupdating;
+    bool hasserverdata;
+    bool hasplayerdata;
+    int lastupdate;
+    int lastteamupdate;
+    serverpreviewdata()
+    {
+        isupdating = false;
+        hasserverdata = false;
+        hasplayerdata = false;
+        lastupdate = 0;
+        lastteamupdate = 0;
+        sdata.reset();
+        tinfo.reset();
+        servaddress.host = 0;
+        servaddress.port = 0;
+        nplayers = 0;
+    }
+    void reset()
+    {
+        isupdating = false;
+        hasserverdata = false;
+        hasplayerdata = false;
+        lastupdate = 0;
+        lastteamupdate = 0;
+        sdata.reset();
+        tinfo.reset();
+        servaddress.host = 0;
+        servaddress.port = 0;
+        nplayers = 0;
+    }
+    void addplayer(struct extplayerdata& data)
+    {
+        if(nplayers >= MAXPREVIEWPLAYERS) return;
+        bool found = false;
+        loopi(nplayers)
+        {
+            if(players[i].cn == data.cn)
+            {
+                players[i].update(data);
+                found = true;
+            }
+        }
+        if(!found)
+        {
+            players[nplayers].update(data);
+            nplayers++;
+        }
+    }
+    void removeplayer(int n)
+    {
+        if(nplayers > 0 && n < nplayers)
+        {
+            nplayers--;
+            loopi(nplayers-n)
+            {
+                players[n+i] = players[n+i+1];
+            }
+        }
+    }
+    void checkdisconected(int timeout)
+    {
+        loopi(nplayers)
+        {
+            if(players[i].lastseen + timeout < totalmillis)
+            {
+                removeplayer(i);
+            }
+        }
+    }
+};
+
+#define MAXEXTRETRIES 2
+#define EXTRETRIESINT 500
+#define EXTREFRESHINT 3000
+
+struct extplayerinfo
+{
+    bool finished;
+    int lastattempt;
+    int attempts;
+    bool needrefresh;
+    struct extplayerdata data;
+    extplayerinfo()
+    {
+        finished = false;
+        needrefresh = false;
+        attempts = 0;
+        lastattempt = totalmillis;
+    }
+    extplayerinfo(bool refresh)
+    {
+        finished = false;
+        needrefresh = refresh;
+        attempts = 0;
+        lastattempt = totalmillis;
+    }
+    void resetextdata()
+    {
+        finished = false;
+        attempts = 0;
+        lastattempt = totalmillis;
+        data.reset();
+    }
+    void setextplayerinfo()
+    {
+        attempts = 0;
+        finished = true;
+    }
+    void setextplayerinfo(struct extplayerdata ndata)
+    {
+        attempts = 0;
+        finished = true;
+        data.update(ndata);
+    }
+    void addattempt()
+    {
+        attempts++;
+        lastattempt = totalmillis;
+    }
+    bool needretry()
+    {
+        if(needrefresh)
+        {
+            return lastattempt + EXTREFRESHINT < totalmillis;
+        }
+        else
+        {
+            return !finished && attempts <= MAXEXTRETRIES && lastattempt + EXTRETRIESINT < totalmillis;
+        }
+    }
+    bool isfinal()
+    {
+        return !needrefresh && (finished || attempts > MAXEXTRETRIES);
+    }
+    int getextplayerinfo()
+    {
+        if(!finished) return -1;
+        return 0;
+    }
+    int getextplayerinfo(struct extplayerdata& ldata)
+    {
+        if(!finished) return -1;
+        ldata.update(data);
+        return 0;
+    }
+};
+// End: Fanatic Edition
+
 struct fpsent : dynent, fpsstate
 {
     int weight;
@@ -599,7 +966,13 @@ struct fpsent : dynent, fpsstate
     int lastpickup, lastpickupmillis, lastbase, lastrepammo, flagpickup, tokens;
     vec lastcollect;
     int frags, flags, deaths, totaldamage, totalshots;
-    int suicides, teamkills; // Fanatic Edition
+
+    // Start: Fanatic Edition
+    int suicides, teamkills;
+    struct extplayerinfo extdata;
+    bool extdatawasinit;
+    // End: Fanatic Edition
+
     editinfo *edit;
     float deltayaw, deltapitch, deltaroll, newyaw, newpitch, newroll;
     int smoothmillis;
@@ -615,6 +988,12 @@ struct fpsent : dynent, fpsstate
     {
         name[0] = team[0] = info[0] = 0;
         respawn();
+
+        // Start: Fanatic Edition
+        extdata.needrefresh = true;
+        extdatawasinit = false;
+        // End: Fanatic Edition
+
     }
     ~fpsent()
     {
@@ -668,8 +1047,6 @@ struct fpsent : dynent, fpsstate
         stopattacksound();
         lastnode = -1;
     }
-
-    bool crouched; // Fanatic Edition
 };
 
 struct teamscore
@@ -689,8 +1066,6 @@ struct teamscore
 
 static inline uint hthash(const teamscore &t) { return hthash(t.team); }
 static inline bool htcmp(const char *key, const teamscore &t) { return htcmp(key, t.team); }
-
-#define MAXTEAMS 128
 
 struct teaminfo
 {

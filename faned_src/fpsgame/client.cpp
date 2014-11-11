@@ -10,18 +10,748 @@ extern void lua_N_SERVCMD(int cn, char * text);
 extern void lua_N_SHOTFX(int cn, int gun, vec *to);
 extern void lua_N_TEXT(int cn, char * text);
 
+#define EXT_ACK                         -1
+#define EXT_PLAYERSTATS_RESP_STATS      -11
+#define EXT_PLAYERSTATS                 1
+#define EXT_TEAMSCORE                   2
+#define EXT_VERSION                     105
+
 namespace game
 {
-    VARP(debugaim, 0, 0, 1);    // Fanatic Edition
-    VARP(debugdamage, 0, 0, 1); // Fanatic Edition
-    VARP(debugshoot, 0, 0, 1);  // Fanatic Edition
+    ENetSocket extinfosock = ENET_SOCKET_NULL;
+
+    ENetSocket getextsock()
+    {
+        if(extinfosock != ENET_SOCKET_NULL) return extinfosock;
+        extinfosock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
+        enet_socket_set_option(extinfosock, ENET_SOCKOPT_NONBLOCK, 1);
+        enet_socket_set_option(extinfosock, ENET_SOCKOPT_BROADCAST, 1);
+        return extinfosock;
+    }
+
+    void requestextinfo(int cn)
+    {
+        const ENetAddress *paddress = connectedpeer();
+        if(!paddress) return;
+        ENetAddress address = *paddress;
+        ENetSocket extsock = getextsock();
+        if(extsock == ENET_SOCKET_NULL) return;
+        address.port = server::serverinfoport(address.port);
+        ENetBuffer buf;
+        uchar send[MAXTRANS];
+        ucharbuf p(send, MAXTRANS);
+        putint(p, 0);
+        putint(p, EXT_PLAYERSTATS);
+        putint(p, cn);
+        buf.data = send;
+        buf.dataLength = p.length();
+        enet_socket_send(extsock, &address, &buf, 1);
+    }
+
+    int extinfoplayerparser(ucharbuf p, struct extplayerdata& data)
+    {
+        char strdata[MAXTRANS];
+
+        getint(p);
+
+        if(getint(p) != EXT_ACK || getint(p) != EXT_VERSION) return -2;
+
+        int err = getint(p);
+        if(err) return -3;
+
+        if(getint(p) != EXT_PLAYERSTATS_RESP_STATS) return -4;
+
+        data.cn = getint(p);
+        data.ping = getint(p);
+        getstring(strdata, p);
+        strncpy(data.name, strdata, MAXEXTNAMELENGHT-1);
+        data.name[MAXEXTNAMELENGHT-1] = 0;
+        getstring(strdata, p);
+        strncpy(data.team, strdata, MAXEXTTEAMLENGHT-1);
+        data.team[MAXEXTTEAMLENGHT-1] = 0;
+        data.frags = getint(p);
+        data.flags = getint(p);
+        data.deaths = getint(p);
+        data.teamkills = getint(p);
+        data.acc = getint(p);
+        data.health = getint(p);
+        data.armour = getint(p);
+        data.gunselect = getint(p);
+        data.privilege = getint(p);
+        data.state = getint(p);
+        return 0;
+    }
+
+
+    int extplayershelper(ucharbuf p, struct extplayerdata& data)
+    {
+        if(getint(p) != 0 || getint(p) != EXT_PLAYERSTATS) return -1;
+        return extinfoplayerparser(p, data);
+    }
+
+    void processextinfo()
+    {
+        const ENetAddress *paddress = connectedpeer();
+        if(!paddress) return;
+        ENetAddress connectedaddress = *paddress;
+        ENetSocket extsock = getextsock();
+        if(extsock == ENET_SOCKET_NULL) return;
+        enet_uint32 events = ENET_SOCKET_WAIT_RECEIVE;
+        int s = 0;
+        ENetBuffer buf;
+        ENetAddress address;
+        uchar data[MAXTRANS];
+        buf.data = data;
+        buf.dataLength = sizeof(data);
+        while((s = enet_socket_wait(extsock, &events, 0)) >= 0 && events)
+        {
+            int len = enet_socket_receive(extsock, &address, &buf, 1);
+            if(len <= 0 || connectedaddress.host != address.host ||
+               server::serverinfoport(connectedaddress.port) != address.port) continue;
+            ucharbuf p(data, len);
+            struct extplayerdata extpdata;
+            if(!extplayershelper(p, extpdata))
+            {
+                fpsent *d = getclient(extpdata.cn);
+                if(!d || d->extdata.isfinal()) continue;
+                d->extdata.setextplayerinfo(extpdata);
+                if(!d->extdatawasinit)
+                {
+                    d->deaths = extpdata.deaths;
+                    d->extdatawasinit = true;
+                }
+            }
+        }
+    }
+
+    ENetSocket servinfosock = ENET_SOCKET_NULL;
+    struct serverpreviewdata lastpreviewdata;
+
+    ENetSocket getservsock()
+    {
+        if(servinfosock != ENET_SOCKET_NULL) return servinfosock;
+        servinfosock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
+        enet_socket_set_option(servinfosock, ENET_SOCKOPT_NONBLOCK, 1);
+        enet_socket_set_option(servinfosock, ENET_SOCKOPT_BROADCAST, 1);
+        return servinfosock;
+    }
+
+    int serverinfoparser(ucharbuf p, int millis, struct serverdata& data)
+    {
+        char strdata[MAXTRANS];
+        data.ping = (totalmillis - millis);
+        data.nclients = getint(p);
+
+        int nargs = getint(p);
+        if(getint(p) != PROTOCOL_VERSION) return -2;
+
+        data.mode = getint(p);
+        data.timelimit = getint(p);
+        data.maxclients = getint(p);
+        data.access = getint(p);
+        if(nargs >= 7)
+        {
+            data.gamepaused = getint(p);
+            data.gamespeed = getint(p);
+        }
+        else
+        {
+            data.gamepaused = 0;
+            data.gamespeed = 100;
+        }
+        getstring(strdata, p);
+        strncpy(data.servname, strdata, MAXSERVSTRING-1);
+        data.servname[MAXSERVSTRING-1] = 0;
+        getstring(strdata, p);
+        strncpy(data.description, strdata, MAXSERVSTRING-1);
+        data.description[MAXSERVSTRING-1] = 0;
+        return 0;
+    }
+
+    int extinfoteamparser(ucharbuf p, int expectedteams, struct teamsinfo& data)
+    {
+        char strdata[MAXTRANS];
+        if(getint(p) != EXT_ACK || getint(p) != EXT_VERSION) return -2;
+
+        data.notteammode = getint(p);
+        data.gamemode = getint(p);
+        data.timeleft = getint(p);
+        if(data.notteammode) return 0;
+        struct teamdata td;
+        loopi(min(32,expectedteams))
+        {
+            getstring(strdata, p);
+            strncpy(td.teamname, strdata, MAXEXTTEAMLENGHT-1);
+            td.teamname[MAXEXTTEAMLENGHT-1] = 0;
+            td.score = getint(p);
+            td.bases = getint(p);
+            loopj(min(32,td.bases)) getint(p);
+            data.addteam(td);
+        }
+        return 0;
+    }
+
+    int serverinfohelper(ucharbuf p,
+                         struct serverdata& sdata,
+                         struct extplayerdata& pdata,
+                         struct teamsinfo& tdata)
+    {
+        int millis = getint(p);
+        int res = 0, type = 0, nteams = 0;
+        char* teamnames[MAXTEAMS];
+        if(millis)
+        {
+            type = 1;
+            res = serverinfoparser(p, millis, sdata);
+        }
+        else
+        {
+            int extinfotype = getint(p);
+            if(extinfotype == EXT_PLAYERSTATS)
+            {
+                type = 2;
+                res = extinfoplayerparser(p, pdata);
+            }
+            else if(extinfotype == EXT_TEAMSCORE)
+            {
+                type = 3;
+                int isold;
+                loopi(lastpreviewdata.nplayers)
+                {
+                    isold = 0;
+                    loopj(nteams)
+                    {
+                        isold = !strcmp(lastpreviewdata.players[i].team, teamnames[j]);
+                        if(isold) break;
+                    }
+                    if(!isold)
+                    {
+                        teamnames[nteams] = new char[MAXSTRLEN];
+                        copystring(teamnames[nteams], lastpreviewdata.players[i].team);
+                        nteams++;
+                    }
+                }
+                loopi(nteams)
+                {
+                    delete[] teamnames[i];
+                }
+                res = extinfoteamparser(p, nteams, tdata);
+            }
+        }
+        return res ? res : type;
+    }
+
+    void requestserverinfosend()
+    {
+        ENetSocket sock = getservsock();
+        if(sock == ENET_SOCKET_NULL) return;
+        lastpreviewdata.lastupdate = totalmillis;
+
+        uchar send[MAXTRANS];
+
+        ENetBuffer buf1;
+        ucharbuf p1(send, MAXTRANS);
+        putint(p1, totalmillis);
+        buf1.data = send;
+        buf1.dataLength = p1.length();
+        enet_socket_send(sock, &lastpreviewdata.servaddress, &buf1, 1);
+
+        ENetBuffer buf2;
+        ucharbuf p2(send, MAXTRANS);
+        putint(p2, 0);
+        putint(p2, EXT_PLAYERSTATS);
+        putint(p2, -1);
+        buf2.data = send;
+        buf2.dataLength = p2.length();
+        enet_socket_send(sock, &lastpreviewdata.servaddress, &buf2, 1);
+    }
+
+    void requeststeaminfosend()
+    {
+        ENetSocket sock = getservsock();
+        if(sock == ENET_SOCKET_NULL) return;
+        lastpreviewdata.lastteamupdate = totalmillis;
+
+        uchar send[MAXTRANS];
+
+        ENetBuffer buf2;
+        ucharbuf p2(send, MAXTRANS);
+        putint(p2, 0);
+        putint(p2, EXT_TEAMSCORE);
+        buf2.data = send;
+        buf2.dataLength = p2.length();
+        enet_socket_send(sock, &lastpreviewdata.servaddress, &buf2, 1);
+    }
+
+    void setserverpreview(const char *servername, int serverport)
+    {
+        lastpreviewdata.reset();
+        if(enet_address_set_host(&lastpreviewdata.servaddress, servername) < 0) return;
+        if(serverport)
+        {
+            lastpreviewdata.servaddress.port = server::serverinfoport(serverport);
+        }
+        else
+        {
+            lastpreviewdata.servaddress.port = SAUERBRATEN_SERVINFO_PORT;
+        }
+        lastpreviewdata.isupdating = true;
+    }
+
+    int sortplayersfn(struct extplayerdata& d1, struct extplayerdata& d2)
+    {
+        return d1.frags > d2.frags;
+    }
+
+    int sortteamsfn(struct teamdata& t1, struct teamdata& t2)
+    {
+        return t1.score > t2.score;
+    }
+
+    void getseserverinfo()
+    {
+        ENetSocket sock = getservsock();
+        if(sock == ENET_SOCKET_NULL || !lastpreviewdata.isupdating) return;
+
+        enet_uint32 events = ENET_SOCKET_WAIT_RECEIVE;
+        int s = 0;
+        ENetBuffer buf;
+        ENetAddress address;
+        uchar data[MAXTRANS];
+        buf.data = data;
+        buf.dataLength = sizeof(data);
+        while((s = enet_socket_wait(sock, &events, 0)) >= 0 && events)
+        {
+            int len = enet_socket_receive(sock, &address, &buf, 1);
+            if(len <= 0 || lastpreviewdata.servaddress.host != address.host ||
+               lastpreviewdata.servaddress.port != address.port) continue;
+            ucharbuf p(data, len);
+            struct serverdata sdata;
+            struct extplayerdata pdata;
+            struct teamsinfo tdata;
+            int type = serverinfohelper(p, sdata, pdata, tdata);
+            switch(type)
+            {
+                case 1:
+                    lastpreviewdata.sdata.update(sdata);
+                    lastpreviewdata.hasserverdata = true;
+                    break;
+                case 2:
+                    lastpreviewdata.addplayer(pdata);
+                    lastpreviewdata.checkdisconected(SERVUPDATEINTERVAL + 2*SERVUPDATETEAMGAP);
+                    break;
+                case 3:
+                    lastpreviewdata.tinfo.update(tdata);
+                    quicksort(lastpreviewdata.tinfo.teams, lastpreviewdata.tinfo.teams+lastpreviewdata.tinfo.nteams, sortteamsfn);
+                    quicksort(lastpreviewdata.players, lastpreviewdata.players+lastpreviewdata.nplayers, sortplayersfn);
+                    lastpreviewdata.hasplayerdata = true;
+                    break;
+            }
+        }
+    }
+
+    void checkseserverinfo()
+    {
+        if(!lastpreviewdata.isupdating) return;
+        if(lastpreviewdata.lastupdate + SERVUPDATEINTERVAL < totalmillis) requestserverinfosend();
+        if(lastpreviewdata.lastteamupdate + SERVUPDATEINTERVAL < totalmillis &&
+           lastpreviewdata.lastupdate + SERVUPDATETEAMGAP < totalmillis) requeststeaminfosend();
+        getseserverinfo();
+    }
+
+    bool isingroup(const char* name, int i)
+    {
+        return (name == NULL || !strcmp(lastpreviewdata.players[i].team, name)) &&
+            lastpreviewdata.players[i].state != CS_SPECTATOR;
+    }
+
+    bool isspec(int i)
+    {
+        return lastpreviewdata.players[i].state == CS_SPECTATOR;
+    }
+
+    bool hasspecs()
+    {
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isspec(i)) return true;
+        }
+        return false;
+    }
+
+    bool hasplayers(const char* groupname)
+    {
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isingroup(groupname, i) && !isspec(i)) return true;
+        }
+        return false;
+    }
+
+    void drawgroup(g3d_gui *g, const char* name)
+    {
+        g->pushlist();
+        g->strut(15);
+        g->text("name", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isingroup(name, i))
+            {
+                g->textf("%s", 0xFFFFFF, NULL, lastpreviewdata.players[i].name);
+            }
+        }
+        g->poplist();
+
+        if(m_check(lastpreviewdata.sdata.mode, M_CTF))
+        {
+            g->pushlist();
+            g->strut(6);
+            g->text("flags", 0x50CFE5);
+            for(int i=0; i<lastpreviewdata.nplayers; i++)
+            {
+                if(isingroup(name, i))
+                {
+                    g->textf("%d", 0xFFFFFF, NULL, lastpreviewdata.players[i].flags);
+                }
+            }
+            g->poplist();
+        }
+
+        g->pushlist();
+        g->strut(6);
+        g->text("frags", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isingroup(name, i))
+            {
+                g->textf("%d", 0xFFFFFF, NULL, lastpreviewdata.players[i].frags);
+            }
+        }
+        g->poplist();
+
+        g->pushlist();
+        g->strut(6);
+        g->text("deaths", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isingroup(name, i))
+            {
+                g->textf("%d", 0xFFFFFF, NULL, lastpreviewdata.players[i].deaths);
+            }
+        }
+        g->poplist();
+
+        g->pushlist();
+        g->strut(6);
+        g->text("kpd", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isingroup(name, i))
+            {
+                float kpd = float(lastpreviewdata.players[i].frags)/max(float(lastpreviewdata.players[i].deaths), 1.0f);
+                g->textf("%4.2f", 0xFFFFFF, NULL, kpd);
+            }
+        }
+        g->poplist();
+
+        g->pushlist();
+        g->strut(5);
+        g->text("acc", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isingroup(name, i))
+            {
+                g->textf("%d%%", 0xFFFFFF, NULL, lastpreviewdata.players[i].acc);
+            }
+        }
+        g->poplist();
+
+        g->pushlist();
+        g->strut(3);
+        g->text("cn", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isingroup(name, i))
+            {
+                g->textf("%d", 0xFFFFFF, NULL, lastpreviewdata.players[i].cn);
+            }
+        }
+        g->poplist();
+
+        g->pushlist();
+        g->strut(6);
+        g->text("ping", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isingroup(name, i))
+            {
+                g->textf("%d", 0xFFFFFF, NULL, lastpreviewdata.players[i].ping);
+            }
+        }
+        g->poplist();
+    }
+
+    void drawspecs(g3d_gui *g)
+    {
+        g->pushlist();
+        g->strut(15);
+        g->text("spectator", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isspec(i))
+            {
+                g->textf("%s", 0xFFFFFF, NULL, lastpreviewdata.players[i].name);
+            }
+        }
+        g->poplist();
+
+        g->pushlist();
+        g->strut(3);
+        g->text("cn", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isspec(i))
+            {
+                g->textf("%d", 0xFFFFFF, NULL, lastpreviewdata.players[i].cn);
+            }
+        }
+        g->poplist();
+
+        g->pushlist();
+        g->strut(6);
+        g->text("ping", 0x50CFE5);
+        loopi(lastpreviewdata.nplayers)
+        {
+            if(isspec(i))
+            {
+                g->textf("%d", 0xFFFFFF, NULL, lastpreviewdata.players[i].ping);
+            }
+        }
+        g->poplist();
+    }
+
+    int showserverpreview(g3d_gui *g)
+    {
+        if(lastpreviewdata.hasserverdata)
+        {
+            string hostname;
+            if(enet_address_get_host_ip(&lastpreviewdata.servaddress, hostname, sizeof(hostname)) >= 0)
+            {
+                g->pushlist();
+                g->spring();
+                g->titlef("%s", 0xFFFFFF, NULL, lastpreviewdata.sdata.description);
+                if(lastpreviewdata.sdata.nclients>=lastpreviewdata.sdata.maxclients)
+                {
+                    g->titlef("  \f3%d/%d  \f7%d", 0xFFFFFF, NULL,
+                              lastpreviewdata.sdata.nclients,
+                              lastpreviewdata.sdata.maxclients, lastpreviewdata.sdata.ping);
+                }
+                else
+                {
+                    g->titlef("  %d/%d  %d", 0xFFFFFF, NULL,
+                              lastpreviewdata.sdata.nclients,
+                              lastpreviewdata.sdata.maxclients, lastpreviewdata.sdata.ping);
+                }
+                g->spring();
+                g->poplist();
+                g->pushlist();
+                g->spring();
+                g->textf("%s", 0x50CFE5, NULL, server::modename(lastpreviewdata.sdata.mode));
+                g->separator();
+                g->textf("%s", 0x50CFE5, NULL, lastpreviewdata.sdata.servname);
+                if(lastpreviewdata.sdata.gamespeed != 100)
+                {
+                    g->separator();
+                    g->textf("%d.%02dx", 0x50CFE5, NULL, lastpreviewdata.sdata.gamespeed/100, lastpreviewdata.sdata.gamespeed%100);
+                }
+                g->separator();
+                int secs = lastpreviewdata.sdata.timelimit%60, mins = lastpreviewdata.sdata.timelimit/60;
+                g->pushlist();
+                g->strut(mins >= 10 ? 4.5f : 3.5f);
+                g->textf("%d:%02d", 0x50CFE5, NULL, mins, secs);
+                g->poplist();
+                if(lastpreviewdata.sdata.gamepaused)
+                {
+                    g->separator();
+                    g->text("paused", 0x50CFE5);
+                }
+                g->spring();
+                g->poplist();
+            }
+        }
+        if(lastpreviewdata.hasplayerdata && lastpreviewdata.nplayers)
+        {
+            g->separator();
+            if(lastpreviewdata.tinfo.notteammode)
+            {
+                if(hasplayers(NULL))
+                {
+                    g->pushlist();
+                    drawgroup(g, NULL);
+                    g->poplist();
+                }
+            }
+            else
+            {
+                int groups = lastpreviewdata.tinfo.nteams;
+                int validgroups = 0;
+                loopi(groups)
+                {
+                    if(hasplayers(lastpreviewdata.tinfo.teams[i].teamname)) validgroups++;
+                }
+                int k = 0;
+                loopi(groups)
+                {
+                    if(!hasplayers(lastpreviewdata.tinfo.teams[i].teamname)) continue;
+                    if((k%2)==0) g->pushlist();
+                    g->pushlist();
+                    if(lastpreviewdata.tinfo.teams[i].score>=10000) g->titlef("%s: WIN", 0xFFFFFF, NULL, lastpreviewdata.tinfo.teams[i].teamname);
+                    else g->titlef("%s: %d", 0xFFFFFF, NULL, lastpreviewdata.tinfo.teams[i].teamname, lastpreviewdata.tinfo.teams[i].score);
+
+                    g->separator();
+
+                    g->pushlist();
+                    drawgroup(g, lastpreviewdata.tinfo.teams[i].teamname);
+                    g->poplist();
+                    g->poplist();
+                    if(k+1<validgroups && (k+1)%2) g->space(5);
+                    else
+                    {
+                        g->poplist();
+                        if(k+1 != validgroups) g->space(1);
+                    }
+                    k++;
+                }
+            }
+            if(hasspecs())
+            {
+                g->space(1);
+                g->pushlist();
+                drawspecs(g);
+                g->poplist();
+            }
+        }
+        g->separator();
+        g->pushlist();
+        g->spring();
+        if(g->button("Back", 0xFFFFFF, "exit")&G3D_UP)
+        {
+            g->poplist();
+            lastpreviewdata.reset();
+            return -1;
+        }
+        g->separator();
+        if(g->button("Connect", 0xFFFFFF, "action")&G3D_UP)
+        {
+            g->poplist();
+            g->end();
+            lastpreviewdata.reset();
+            return 1;
+        }
+        g->spring();
+        g->poplist();
+        g->allowautotab(true);
+        return NULL;
+    }
+
+    extern vector<fpsent *> clients;
+    void checkextinfos()
+    {
+        const ENetAddress *paddress = connectedpeer();
+        if(!paddress) return;
+        processextinfo();
+        loopv(clients)
+        {
+            fpsent * d = clients[i];
+            if(!d) continue;
+            if(d->extdata.needretry())
+            {
+                d->extdata.addattempt();
+                requestextinfo(d->clientnum);
+            }
+        }
+        if(player1->extdata.needretry())
+        {
+            player1->extdata.addattempt();
+            requestextinfo(player1->clientnum);
+        }
+    }
+
+    ENetSocket extinfosock2 = ENET_SOCKET_NULL;
+
+    ENetSocket getextsock2()
+    {
+        if(extinfosock2 != ENET_SOCKET_NULL) return extinfosock2;
+        extinfosock2 = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
+        enet_socket_set_option(extinfosock2, ENET_SOCKOPT_NONBLOCK, 1);
+        enet_socket_set_option(extinfosock2, ENET_SOCKOPT_BROADCAST, 1);
+        return extinfosock2;
+    }
+
+    void requestgameinfo(ENetAddress address)
+    {
+        ENetSocket extsock = getextsock2();
+        if(!extsock) return;
+        ENetBuffer buf;
+        uchar send[MAXTRANS];
+        ucharbuf p(send, MAXTRANS);
+        putint(p, 0);
+        putint(p, EXT_PLAYERSTATS);
+        putint(p, -1);
+        buf.data = send;
+        buf.dataLength = p.length();
+        enet_socket_send(extsock, &address, &buf, 1);
+    }
+
+    #define DISCONNECTEDINTERVAL 10000
+
+    void checkservergameinfo()
+    {
+        ENetSocket extsock = getextsock2();
+        if(!extsock) return;
+        enet_uint32 events = ENET_SOCKET_WAIT_RECEIVE;
+        int s = 0;
+        ENetBuffer buf;
+        ENetAddress address;
+        uchar data[MAXTRANS];
+        buf.data = data;
+        buf.dataLength = sizeof(data);
+        while((s = enet_socket_wait(extsock, &events, 0)) >= 0 && events)
+        {
+            int len = enet_socket_receive(extsock, &address, &buf, 1);
+            if(len <= 0) continue;
+            ucharbuf p(data, len);
+            struct extplayerdata extpdata;
+            if(!extplayershelper(p, extpdata))
+            {
+                void *p = getservergameinfo(address);
+                struct serverpreviewdata *pr;
+                if(!p)
+                {
+                    pr = new serverpreviewdata;
+                }
+                else
+                {
+                    pr = (struct serverpreviewdata*) p;
+                }
+                pr->addplayer(extpdata);
+                pr->checkdisconected(DISCONNECTEDINTERVAL);
+                saveservergameinfo(address, pr);
+            }
+        }
+    }
+
+    VARP(debugaim, 0, 0, 1);
+    VARP(debugdamage, 0, 0, 1);
+    VARP(debugshoot, 0, 0, 1);
 
     FVARP(minimapalpha, 0, 0.5f, 1);
     VARP(maxradarscale, 1, 1024, 10000);
     VARP(minradarscale, 0, 384, 10000);
     VARP(radarteammates, 0, 1, 1);
-    VARP(radarteammatesdead, 0, 0, 1); // Fanatic Edition
-    VARP(radarteammatesplayerstarts, 0, 1, 1); // Fanatic Edition
+    VARP(radarteammatesdead, 0, 0, 1);
+    VARP(radarteammatesplayerstarts, 0, 1, 1);
+    // End: Fanatic Edition
 
     float calcradarscale()
     {
@@ -1070,6 +1800,18 @@ namespace game
         messagereliable = false;
         messagecn = -1;
         player1->respawn();
+
+        // Start: Fanatic Edition
+        player1->frags = player1->flags = 0;
+        player1->deaths = 0;
+        player1->totaldamage = 0;
+        player1->totalshots = 0;
+        player1->maxhealth = 100;
+
+        player1->extdata.resetextdata();
+        player1->extdatawasinit = false;
+        // End: Fanatic Edition
+
         player1->lifesequence = 0;
         player1->state = CS_ALIVE;
         player1->privilege = PRIV_NONE;
@@ -1104,8 +1846,8 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                            )
-                        ), text);
+                           )
+                       ), text);
             }
             else
             {
@@ -1118,8 +1860,8 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                            )
-                        ), text);
+                           )
+                       ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFFFFFF, 4.0f, -8);
             }
         }
@@ -1136,8 +1878,8 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                            )
-                        ), text);
+                           )
+                       ), text);
             }
             else
             {
@@ -1150,8 +1892,8 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                            )
-                        ), text);
+                           )
+                       ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFFFFFF, 4.0f, -8);
             }
         }
@@ -1180,8 +1922,8 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                            )
-                        ), text);
+                           )
+                       ), text);
             }
             else
             {
@@ -1193,8 +1935,8 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                            )
-                        ), text);
+                           )
+                       ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0x2222FF, 4.0f, -8);
             }
         }
@@ -1210,8 +1952,8 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                            )
-                        ), text);
+                           )
+                       ), text);
             }
             else
             {
@@ -1223,8 +1965,8 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                            )
-                        ), text);
+                           )
+                       ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFF2222, 4.0f, -8);
             }
         }
@@ -1670,6 +2412,7 @@ namespace game
             {
                 connected = true;
                 notifywelcome();
+                requestextinfo(-1); // Fanatic Edition
                 break;
             }
 
@@ -1756,8 +2499,8 @@ namespace game
                                 isauth(d->clientnum) ? ", Auth" :
                                 (
                                     ismaster(d->clientnum) ? ", Master" : ""
-                                )
-                            ), text);
+                               )
+                           ), text);
                     }
                     else {
                         conoutf(CON_CHAT, "%s%s \fs\f4(%d%s)\fr\f7: %s",
@@ -1769,8 +2512,8 @@ namespace game
                                 isauth(d->clientnum) ? ", Auth" :
                                 (
                                     ismaster(d->clientnum) ? ", Master" : ""
-                                )
-                            ), text);
+                               )
+                           ), text);
                     }
                 }
                 else
@@ -1786,8 +2529,8 @@ namespace game
                                 isauth(d->clientnum) ? ", Auth" :
                                 (
                                     ismaster(d->clientnum) ? ", Master" : ""
-                                )
-                            ), text);
+                               )
+                           ), text);
                     }
                     else {
                         conoutf(CON_CHAT, "%s%s \fs\f4(%d%s)\fr\f7: %s",
@@ -1799,8 +2542,8 @@ namespace game
                                 isauth(d->clientnum) ? ", Auth" :
                                 (
                                     ismaster(d->clientnum) ? ", Master" : ""
-                                )
-                            ), text);
+                               )
+                           ), text);
                     }
                 }
                 if(playchatsound)
@@ -1834,8 +2577,8 @@ namespace game
                                 isauth(t->clientnum) ? ", Auth" :
                                 (
                                     ismaster(t->clientnum) ? ", Master" : ""
-                                )
-                            ), text);
+                               )
+                           ), text);
                     }
                     else {
                         conoutf(CON_CHAT, "\f1%s \fs\f4(%d%s)\fr\f1: %s",
@@ -1846,8 +2589,8 @@ namespace game
                                 isauth(t->clientnum) ? ", Auth" :
                                 (
                                     ismaster(t->clientnum) ? ", Master" : ""
-                                )
-                            ), text);
+                               )
+                           ), text);
                     }
                 }
                 else
@@ -1862,8 +2605,8 @@ namespace game
                                 isauth(t->clientnum) ? ", Auth" :
                                 (
                                     ismaster(t->clientnum) ? ", Master" : ""
-                                )
-                            ), text);
+                               )
+                           ), text);
                     }
                     else {
                         conoutf(CON_CHAT, "\f3%s \fs\f4(%d%s)\fr\f3: %s",
@@ -1874,8 +2617,8 @@ namespace game
                                 isauth(t->clientnum) ? ", Auth" :
                                 (
                                     ismaster(t->clientnum) ? ", Master" : ""
-                                )
-                            ), text);
+                               )
+                           ), text);
                     }
                 }
                 if(playchatsound)
@@ -1931,6 +2674,7 @@ namespace game
 
             case N_INITCLIENT:
             {
+                // Start: Fanatic Edition
                 int cn = getint(p);
                 fpsent *d = newclient(cn);
                 if(!d)
@@ -1952,7 +2696,7 @@ namespace game
                 }
                 else
                 {
-                    conoutf("\f0connected:\f7 %s", colorname(d, text)); // Fanatic Edition
+                    conoutf("\f0connected:\f7 %s", colorname(d, text));
                     if(needclipboard >= 0) needclipboard++;
                 }
                 copystring(d->name, text, MAXNAMELEN+1);
@@ -1964,7 +2708,9 @@ namespace game
                     defformatstring(str)("onconnect %d", d->clientnum);
                     execute(str);
                 }
+                requestextinfo(cn);
                 break;
+                // End: Fanatic Edition
             }
 
             case N_SWITCHNAME:
@@ -2091,7 +2837,7 @@ namespace game
                         "\f9FanEd\f7::anticheat: Client \f4%s (%d)\f7, Type: \f4from.dist(to) > guns[gun].range + 1\f7, AKA: \f4Modified Gunrange",
                         s->name,
                         s->clientnum
-                    );
+                   );
                     playsound(S_WARNING);
                 }
                 if(anticheat && !m_edit && (s->gunselect < GUN_FIST || s->gunselect > GUN_PISTOL))
@@ -2100,7 +2846,7 @@ namespace game
                         "\f9FanEd\f7::anticheat: Client \f4%s (%d)\f7, Type: \f4from.dist(to) > guns[gun].range + 1\f7, AKA: \f4Unknown Weapon",
                         s->name,
                         s->clientnum
-                    );
+                   );
                     playsound(S_WARNING);
                 }
                 // End: Fanatic Edition
@@ -2139,7 +2885,7 @@ namespace game
                         d->name,
                         d->clientnum,
                         damage
-                    );
+                   );
                 }
                 if(identexists("ondamage"))
                 {
@@ -2307,7 +3053,7 @@ namespace game
                        d->name,
                        d->clientnum,
                        sel.s.x*sel.s.y*sel.s.z
-                    );
+                   );
                     playsound(S_WARNING);
                 }
                 int dir, mode, tex, newtex, mat, filter, allfaces, insel;
@@ -2424,12 +3170,12 @@ namespace game
             case N_SENDDEMOLIST:
             {
                 int demos = getint(p);
-                if(demos <= 0) conoutf(CON_INFO, "\f9FanEd\f7::parsemessages: no demos available"); // Fanatic Edition
+                if(demos <= 0) conoutf("no demos available");
                 else loopi(demos)
                 {
                     getstring(text, p);
                     if(p.overread()) break;
-                    conoutf(CON_INFO, "\f9FanEd\f7::parsemessages: demo \f9#%d\f7. \f4%s", i+1, text); // Fanatic Edition
+                    conoutf("%d. %s", i+1, text);
                 }
                 break;
             }
@@ -2464,7 +3210,7 @@ namespace game
                 if(mm != mastermode)
                 {
                     mastermode = mm;
-                    conoutf(CON_INFO, "mastermode is %s \f4(%d)", server::mastermodename(mastermode), mastermode); // Fanatic Edition
+                    conoutf("mastermode is %s (%d)", server::mastermodename(mastermode), mastermode);
                 }
                 break;
             }
@@ -2472,7 +3218,7 @@ namespace game
             case N_MASTERMODE:
             {
                 mastermode = getint(p);
-                conoutf(CON_INFO, "mastermode is %s \f4(%d)", server::mastermodename(mastermode), mastermode); // Fanatic Edition
+                conoutf("mastermode is %s (%d)", server::mastermodename(mastermode), mastermode);
                 break;
             }
 
@@ -2798,15 +3544,13 @@ namespace game
     }
     ICOMMAND(cleardemos, "i", (int *val), cleardemos(*val));
 
-    // Start: Fanatic Edition
     void getdemo(int i)
     {
-        if(i<=0) conoutf(CON_INFO, "\f9FanEd\f7::getdemo: getting demo...");
-        else conoutf(CON_INFO, "\f9FanEd\f7::getdemo: getting demo \f4%d\f7...", i);
+        if(i<=0) conoutf("getting demo...");
+        else conoutf("getting demo %d...", i);
         addmsg(N_GETDEMO, "ri", i);
     }
     ICOMMAND(getdemo, "i", (int *val), getdemo(*val));
-    // End: Fanatic Edition
 
     void listdemos()
     {
@@ -2942,6 +3686,257 @@ namespace game
         player1->resetinterp();
     }
     COMMANDN(gotosel, gotoselection, "");
+}
+
+// Start: Fanatic Edition »Extinfos«, mainly forked from extra-a's sauer-sdl2 client;
+
+void cleangameinfo(void* p)
+{
+    if(!p) return;
+    serverpreviewdata *s = (serverpreviewdata*) p;
+    delete s;
+}
+
+struct playersentry
+{
+    const char* pname;
+    const char* sdesc;
+    const char* shost;
+    int sping, splayers, smaxplayers, smode, sicon, sport;
+    uint sip;
+
+    playersentry()
+    {
+        pname = "";
+        sdesc = "";
+        shost = "";
+        sping = 0;
+        splayers = 0;
+        smaxplayers = 0;
+        smode = 0;
+        sicon = 0;
+        sip = 0;
+        sport = 0;
+    }
+
+    playersentry(const char* name, const char* desc, const char* host,
+                 int ping, int players, int maxplayers, int mode, int icon, uint ip, int port)
+    {
+        pname = name;
+        sdesc = desc;
+        shost = host;
+        sping = ping;
+        splayers = players;
+        smaxplayers = maxplayers;
+        smode = mode;
+        sicon = icon;
+        sip = ip;
+        sport = port;
+    }
+};
+
+bool playersentrysort (const playersentry& p1, const playersentry& p2)
+{
+    int r = strncmp(p1.pname, p2.pname, MAXEXTNAMELENGHT);
+    if(r) return r < 0;
+    return strncmp(p1.sdesc, p2.sdesc, MAXSERVSTRING) < 0;
+}
+
+extern int showserverpreview;
+
+static char prevhost[100];
+static int prevport;
+static bool playersserverpreview = false;
+
+static void onconnectseq(g3d_gui *g, playersentry &e)
+{
+    g->poplist();
+    g->mergehits(false);
+    g->poplist();
+    g->allowautotab(true);
+
+    if(showserverpreview)
+    {
+        playersserverpreview = true;
+        strncpy(prevhost, e.shost, 100);
+        prevport = e.sport;
+        game::setserverpreview(prevhost, prevport);
+    }
+    else
+    {
+        connectserver(e.shost, e.sport);
+    }
+}
+
+int autoupdateplayersearch = 0;
+static char savedfilter[MAXEXTNAMELENGHT];
+
+bool needsearch = false;
+void showplayersgui(g3d_gui *g, uint *name)
+{
+    if(autoupdateplayersearch)
+    {
+        needsearch = true;
+    }
+    if(playersserverpreview)
+    {
+        g->allowautotab(false);
+        int cmd = game::showserverpreview(g);
+        switch(cmd)
+        {
+            case 0:
+                return;
+            case 1:
+                g->allowautotab(true);
+                playersserverpreview = false;
+                connectserver(prevhost, prevport);
+                return;
+            case -1:
+                g->allowautotab(true);
+                playersserverpreview = false;
+                return;
+        }
+        g->allowautotab(true);
+        return;
+    }
+    vector<serverinfodata *> v = getservers();
+    vector<playersentry> p0, pe;
+    loopv(v)
+    {
+        serverinfodata* s = v[i];
+        if(!s) continue;
+        serverpreviewdata *p = static_cast<serverpreviewdata *>(s->gameinfo);
+        if(!p || s->ping == serverinfodata::WAITING) continue;
+        if(autoupdateplayersearch)
+        {
+            p->checkdisconected(DISCONNECTEDINTERVAL);
+        }
+        loopj(p->nplayers)
+        {
+            int mode = 0, maxplayers = 0, icon = 0;
+            if(s->attr.length() >= 4)
+            {
+                maxplayers = s->attr[3];
+                icon = s->attr[4];
+            }
+            if(s->attr.length() >= 1)
+            {
+                mode = s->attr[1];
+            }
+            p0.add(playersentry(
+                p->players[j].name,
+                s->sdesc,
+                s->name,
+                s->ping,
+                s->numplayers,
+                maxplayers,
+                mode,
+                icon,
+                s->address.host,
+                s->port
+                )
+            );
+        }
+    }
+
+    g->allowautotab(false);
+    g->pushlist();
+    g->textf("Filter: ", 0xFFFFFF, NULL);
+    const char* filter = g->field("", 0xFFFFFF, MAXEXTNAMELENGHT-1, 0, savedfilter);
+    g->spring();
+    if(g->button("auto-update", 0xFFFFFF, autoupdateplayersearch ? "radio_on" : "radio_off")&G3D_UP)
+    {
+        autoupdateplayersearch = !autoupdateplayersearch;
+    }
+    g->poplist();
+    g->separator();
+
+    if(filter)
+    {
+        strncpy(savedfilter, filter, MAXEXTNAMELENGHT-1);
+    }
+    if(strnlen(savedfilter, MAXEXTNAMELENGHT-1) > 0)
+    {
+        loopv(p0)
+        {
+            if(strstr(p0[i].pname, savedfilter) != NULL)
+            {
+                pe.add(p0[i]);
+            }
+        }
+    }
+    else
+    {
+        pe = p0;
+    }
+    pe.sort(playersentrysort);
+    int len = pe.length(), k = 0, kt = 0, maxcount = 20;
+
+    loopi(len/maxcount + 1)
+    {
+        if(i>0 && k<len)
+        {
+            g->tab();
+            g->pushlist();
+            g->textf("Filter: ", 0xFFFFFF, NULL);
+            g->field("", 0xFFFFFF, MAXEXTNAMELENGHT-1, 0, savedfilter);
+            g->spring();
+            if(g->button("auto-update", 0xFFFFFF, autoupdateplayersearch ? "radio_on" : "radio_off")&G3D_UP)
+            {
+                autoupdateplayersearch = !autoupdateplayersearch;
+            }
+            g->poplist();
+            g->separator();
+        }
+
+        g->pushlist();
+        g->mergehits(true);
+        g->pushlist();
+        g->strut(20);
+        g->text("name", 0x50CFE5);
+        kt = k;
+        loopj(maxcount)
+        {
+            if(kt>=len)
+            {
+                g->buttonf(" ", 0xFFFFFF, NULL);
+            }
+            else
+            {
+                playersentry e = pe[kt];
+                if(g->buttonf("%s", 0xFFFFFF, NULL, e.pname)&G3D_UP)
+                {
+                    onconnectseq(g, e);
+                    return;
+                }
+                kt++;
+            }
+        }
+        g->poplist();
+
+        g->separator();
+
+        g->pushlist();
+        g->strut(20);
+        g->text("server", 0x50CFE5);
+        kt = k;
+        loopj(maxcount)
+        {
+            if(kt>=len) break;
+            playersentry e = pe[kt];
+            if(g->buttonf("%.25s", 0xFFFFFF, NULL, e.sdesc)&G3D_UP)
+            {
+                onconnectseq(g, e);
+                return;
+            }
+            kt++;
+        }
+        g->poplist();
+        g->mergehits(false);
+        g->poplist();
+        k = kt;
+    }
+    g->allowautotab(true);
 }
 // End: Fanatic Edition
 

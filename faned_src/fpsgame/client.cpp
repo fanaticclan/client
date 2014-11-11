@@ -1846,7 +1846,7 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                           )
+                            )
                         ), text);
             }
             else
@@ -1860,7 +1860,7 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                           )
+                            )
                         ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFFFFFF, 4.0f, -8);
             }
@@ -1878,7 +1878,7 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                           )
+                            )
                         ), text);
             }
             else
@@ -1892,7 +1892,7 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                           )
+                            )
                         ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFFFFFF, 4.0f, -8);
             }
@@ -1922,7 +1922,7 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                           )
+                            )
                         ), text);
             }
             else
@@ -1935,7 +1935,7 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                           )
+                            )
                         ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0x2222FF, 4.0f, -8);
             }
@@ -1952,7 +1952,7 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                           )
+                            )
                         ), text);
             }
             else
@@ -1965,7 +1965,7 @@ namespace game
                             isauth(player1->clientnum) ? ", Auth" :
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
-                           )
+                            )
                         ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFF2222, 4.0f, -8);
             }
@@ -2499,8 +2499,8 @@ namespace game
                                 isauth(d->clientnum) ? ", Auth" :
                                 (
                                     ismaster(d->clientnum) ? ", Master" : ""
-                               )
-                           ), text);
+                                )
+                            ), text);
                     }
                     else {
                         conoutf(CON_CHAT, "%s%s \fs\f4(%d%s)\fr\f7: %s",
@@ -2512,8 +2512,8 @@ namespace game
                                 isauth(d->clientnum) ? ", Auth" :
                                 (
                                     ismaster(d->clientnum) ? ", Master" : ""
-                               )
-                           ), text);
+                                )
+                            ), text);
                     }
                 }
                 else
@@ -2529,8 +2529,8 @@ namespace game
                                 isauth(d->clientnum) ? ", Auth" :
                                 (
                                     ismaster(d->clientnum) ? ", Master" : ""
-                               )
-                           ), text);
+                                )
+                            ), text);
                     }
                     else {
                         conoutf(CON_CHAT, "%s%s \fs\f4(%d%s)\fr\f7: %s",
@@ -2542,8 +2542,8 @@ namespace game
                                 isauth(d->clientnum) ? ", Auth" :
                                 (
                                     ismaster(d->clientnum) ? ", Master" : ""
-                               )
-                           ), text);
+                                )
+                            ), text);
                     }
                 }
                 if(playchatsound)
@@ -2577,8 +2577,8 @@ namespace game
                                 isauth(t->clientnum) ? ", Auth" :
                                 (
                                     ismaster(t->clientnum) ? ", Master" : ""
-                               )
-                           ), text);
+                                )
+                            ), text);
                     }
                     else {
                         conoutf(CON_CHAT, "\f1%s \fs\f4(%d%s)\fr\f1: %s",
@@ -2589,8 +2589,8 @@ namespace game
                                 isauth(t->clientnum) ? ", Auth" :
                                 (
                                     ismaster(t->clientnum) ? ", Master" : ""
-                               )
-                           ), text);
+                                )
+                            ), text);
                     }
                 }
                 else
@@ -2605,8 +2605,8 @@ namespace game
                                 isauth(t->clientnum) ? ", Auth" :
                                 (
                                     ismaster(t->clientnum) ? ", Master" : ""
-                               )
-                           ), text);
+                                )
+                            ), text);
                     }
                     else {
                         conoutf(CON_CHAT, "\f3%s \fs\f4(%d%s)\fr\f3: %s",
@@ -2617,8 +2617,8 @@ namespace game
                                 isauth(t->clientnum) ? ", Auth" :
                                 (
                                     ismaster(t->clientnum) ? ", Master" : ""
-                               )
-                           ), text);
+                                )
+                            ), text);
                     }
                 }
                 if(playchatsound)
@@ -2837,7 +2837,7 @@ namespace game
                         "\f9FanEd\f7::anticheat: Client \f4%s (%d)\f7, Type: \f4from.dist(to) > guns[gun].range + 1\f7, AKA: \f4Modified Gunrange",
                         s->name,
                         s->clientnum
-                   );
+                    );
                     playsound(S_WARNING);
                 }
                 if(anticheat && !m_edit && (s->gunselect < GUN_FIST || s->gunselect > GUN_PISTOL))
@@ -2846,7 +2846,7 @@ namespace game
                         "\f9FanEd\f7::anticheat: Client \f4%s (%d)\f7, Type: \f4from.dist(to) > guns[gun].range + 1\f7, AKA: \f4Unknown Weapon",
                         s->name,
                         s->clientnum
-                   );
+                    );
                     playsound(S_WARNING);
                 }
                 // End: Fanatic Edition
@@ -2885,7 +2885,7 @@ namespace game
                         d->name,
                         d->clientnum,
                         damage
-                   );
+                    );
                 }
                 if(identexists("ondamage"))
                 {
@@ -3053,7 +3053,7 @@ namespace game
                        d->name,
                        d->clientnum,
                        sel.s.x*sel.s.y*sel.s.z
-                   );
+                    );
                     playsound(S_WARNING);
                 }
                 int dir, mode, tex, newtex, mat, filter, allfaces, insel;

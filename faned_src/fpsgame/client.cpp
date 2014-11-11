@@ -1847,7 +1847,7 @@ namespace game
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
                            )
-                       ), text);
+                        ), text);
             }
             else
             {
@@ -1861,7 +1861,7 @@ namespace game
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
                            )
-                       ), text);
+                        ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFFFFFF, 4.0f, -8);
             }
         }
@@ -1879,7 +1879,7 @@ namespace game
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
                            )
-                       ), text);
+                        ), text);
             }
             else
             {
@@ -1893,7 +1893,7 @@ namespace game
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
                            )
-                       ), text);
+                        ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFFFFFF, 4.0f, -8);
             }
         }
@@ -1923,7 +1923,7 @@ namespace game
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
                            )
-                       ), text);
+                        ), text);
             }
             else
             {
@@ -1936,7 +1936,7 @@ namespace game
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
                            )
-                       ), text);
+                        ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0x2222FF, 4.0f, -8);
             }
         }
@@ -1953,7 +1953,7 @@ namespace game
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
                            )
-                       ), text);
+                        ), text);
             }
             else
             {
@@ -1966,7 +1966,7 @@ namespace game
                             (
                                 ismaster(player1->clientnum) ? ", Master" : ""
                            )
-                       ), text);
+                        ), text);
                 particle_textcopy(player1->abovehead(), text, PART_TEXT, 2000, 0xFF2222, 4.0f, -8);
             }
         }

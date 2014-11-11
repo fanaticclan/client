@@ -124,6 +124,7 @@
 <sub>`hudminiscoreboardcolor 0-9-A-Z`</sub><br />
 <sub>`hudminiscoreboardlimitcmode iNT` Limit the players shown at the mini scoreboard in ctf/collect mode (with radar);</sub><br />
 <sub>`hudminiscoreboardlimit iNT` Limit the players shown at the mini scoreboard;</sub><br />
+<sub>`hudminiscoreboardforce 0|1` Force yourself to be the first player shown at the mini scoreboard;</sub><br />
 <sub>`hudstats 0|1`</sub><br />
 <sub>`hudstatsalpha 0-255`</sub><br />
 <sub>`hudstatscolor 0-9-A-Z`</sub><br />
@@ -161,6 +162,7 @@
 <sub>`shotsparks 0|1`</sub><br />
 <sub>`showbuildversion 0|1` Enable or disable Fanatic Edition's build version in main menu;</sub><br />
 <sub>`showhighlight 0|1`</sub><br />
+<sub>`showserverpreview 0|1` Enable or disable server previews before connecting to a server;</sub><br />
 <sub>`showteamscores 0|1` Show team scores time at upper right corner/below minimap;</sub><br />
 <sub>`showtimeremaining 0|1` Show remaining time at upper right corner/below minimap;</sub><br />
 <sub>`smokecolorrainbow 0|1`</sub><br />

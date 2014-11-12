@@ -1,8 +1,8 @@
 // weapon.cpp: all shooting and effects code, projectile management
 #include "game.h"
 
-VARP(blood, 0, 1, 1);
 // Start: Fanatic Edition
+VARP(blood, 0, 1, 1);
 HVARP(bloodcolor, 0, 0x9F0000, 0xFFFFFF);
 FVARP(bloodintensity, 0, 5.0f, INT_MAX);
 
@@ -32,8 +32,6 @@ VARP(ritraillightning, 0, 0, 1);
 VARP(ritrailsmoke, 0, 1, 1);
 VARP(ritrailspin, 0, 0, 1);
 
-VARP(shotsparks, 0, 1, 1);
-
 HVARP(lasercolor, 0, 0x222222, 0xFFFFFF);
 VARP(lasercolorrainbow, 0, 0, 1);
 VARP(lasercolorteam, 0, 0, 1);
@@ -46,9 +44,15 @@ HVARP(smokecolor, 0, 0x222222, 0xFFFFFF);
 VARP(smokecolorrainbow, 0, 0, 1);
 VARP(smokecolorteam, 0, 0, 1);
 
+HVARP(teamcolorred, 0, 0xFC0907, 0xFFFFFF);
+HVARP(teamcolorblue, 0, 0x0789FC, 0xFFFFFF);
+HVARP(teamcolorgreen, 0, 0x32FF64, 0xFFFFFF);
+
 HVARP(spincolor, 0, 0x222222, 0xFFFFFF);
 VARP(spincolorrainbow, 0, 0, 1);
 VARP(spincolorteam, 0, 0, 1);
+
+VARP(shotsparks, 0, 1, 1);
 
 VARP(ducky, 0, 0, 1);
 // End: Fanatic Edition
@@ -179,7 +183,7 @@ namespace game
         raycubepos(from, dir, dest, range, RAY_CLIPMAT|RAY_ALPHAPOLY);
     }
 
-    void createrays(int gun, const vec &from, const vec &to)             // create random spread of rays
+    void createrays(int gun, const vec &from, const vec &to)
     {
         loopi(guns[gun].rays) offsetray(from, to, guns[gun].spread, guns[gun].range, rays[i]);
     }
@@ -270,11 +274,11 @@ namespace game
             
             // Start: Fanatic Edition
             int teamsmokecolor;
-            if(!m_teammode) teamsmokecolor = 0x32FF64;
+            if(!m_teammode) teamsmokecolor = teamcolorgreen;
             else
             {
-                if(!joinred) teamsmokecolor = isteam(bnc.owner->team, player1->team) ? 0x2222FF : 0xFF2222;
-                else teamsmokecolor = isteam(bnc.owner->team, player1->team) ? 0xFF2222 : 0x2222FF;
+                if(!joinred) teamsmokecolor = isteam(bnc.owner->team, player1->team) ? teamcolorblue : teamcolorred;
+                else teamsmokecolor = isteam(bnc.owner->team, player1->team) ? teamcolorred : teamcolorblue;
             }
             // End: Fanatic Edition
             
@@ -425,7 +429,7 @@ namespace game
             h.lifesequence = f->lifesequence;
             h.info1 = int(info1*DMF);
             h.info2 = info2;
-            h.dir = f==at ? ivec(0, 0, 0) : ivec(int(vel.x*DNF), int(vel.y*DNF), int(vel.z*DNF));
+            h.dir = f==at ? ivec(0, 0, 0) : ivec(vec(vel).mul(DNF));
             // Start: Fanatic Edition
             if(at==player1)
             {
@@ -483,11 +487,11 @@ namespace game
         playsound(gun!=GUN_GL ? S_RLHIT : S_FEXPLODE, &v);
 
         int teamsmokecolor;
-        if(!m_teammode) teamsmokecolor = 0x32FF64;
+        if(!m_teammode) teamsmokecolor = teamcolorgreen;
         else
         {
-            if(!joinred) teamsmokecolor = isteam(owner->team, player1->team) ? 0x2222FF : 0xFF2222;
-            else teamsmokecolor = isteam(owner->team, player1->team) ? 0xFF2222 : 0x2222FF;
+            if(!joinred) teamsmokecolor = isteam(owner->team, player1->team) ? teamcolorblue : teamcolorred;
+            else teamsmokecolor = isteam(owner->team, player1->team) ? teamcolorred : teamcolorblue;
         }
         particle_splash(PART_SMOKE, 5, 2500, v, smokecolorrainbow ? rnd(16777216) : (smokecolorteam ? teamsmokecolor : smokecolor), 12.0f, 50, 500);
 
@@ -598,11 +602,11 @@ namespace game
 
             // Start: Fanatic Edition
             int teamsmokecolor;
-            if(!m_teammode) teamsmokecolor = 0x32FF64;
+            if(!m_teammode) teamsmokecolor = teamcolorgreen;
             else
             {
-                if(!joinred) teamsmokecolor = isteam(p.owner->team, player1->team) ? 0x2222FF : 0xFF2222;
-                else teamsmokecolor = isteam(p.owner->team, player1->team) ? 0xFF2222 : 0x2222FF;
+                if(!joinred) teamsmokecolor = isteam(p.owner->team, player1->team) ? teamcolorblue : teamcolorred;
+                else teamsmokecolor = isteam(p.owner->team, player1->team) ? teamcolorred : teamcolorblue;
             }
             // End: Fanatic Edition
 

@@ -28,15 +28,11 @@ function lua_N_EDITMODE(cn, val) end
 
 function lua_N_SAYTEAM(cn, text) end
 
-function lua_N_SERVCMD(cn, text)
-     servcmd(text)
-end
+function lua_N_SERVCMD(cn, text) end
 
 function lua_N_SHOTFX(cn, gun, to1, to2, to3) end
 
-function lua_N_TEXT(cn, text)
-    chatcmd(cn, text)
-end
+function lua_N_TEXT(cn, text) end
 
 --[[
 

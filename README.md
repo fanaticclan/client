@@ -103,7 +103,6 @@
 <sub>`crosshairnamesalpha 0-255`</sub><br />
 <sub>`crosshairnamescolor 0-9-A-Z`</sub><br />
 <sub>`crosshairnamesdelay 0-10000`</sub><br />
-<sub>`crouch` Bind it to a key for experimental crouching (Note: Other players will **not** see you crouched.);</sub><br />
 <sub>`ctfsoundset "STR"` Set the desired soundset for ctf modes;</sub><br />
 <sub>`damagemotion 0|1` Enable or disable special effects after getting damage from explosives;</sub><br />
 <sub>`date %FORMAT` Returns the current date/time in given format; example: `echo (date %Y-%m-%d %H:%M:%S)`;</sub><br />

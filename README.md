@@ -121,9 +121,9 @@
 <sub>`hudminiscoreboard 0|1` Show a small mini scoreboard at the right side of the hud;</sub><br />
 <sub>`hudminiscoreboardalpha 0-255`</sub><br />
 <sub>`hudminiscoreboardcolor 0-9-A-Z`</sub><br />
+<sub>`hudminiscoreboardforce 0|1` Force yourself to be the first player shown at the mini scoreboard;</sub><br />
 <sub>`hudminiscoreboardlimitcmode iNT` Limit the players shown at the mini scoreboard in ctf/collect mode (with radar);</sub><br />
 <sub>`hudminiscoreboardlimit iNT` Limit the players shown at the mini scoreboard;</sub><br />
-<sub>`hudminiscoreboardforce 0|1` Force yourself to be the first player shown at the mini scoreboard;</sub><br />
 <sub>`hudstats 0|1`</sub><br />
 <sub>`hudstatsalpha 0-255`</sub><br />
 <sub>`hudstatscolor 0-9-A-Z`</sub><br />
@@ -172,6 +172,9 @@
 <sub>`spincolorteam 0|1`</sub><br />
 <sub>`system STR` Runs any system command ingame and returns exit/error informations;</sub><br />
 <sub>`teamblue` Join the blue team;</sub><br />
+<sub>`teamcolorblue RGB|HEX`</sub><br />
+<sub>`teamcolorgreen RGB|HEX`</sub><br />
+<sub>`teamcolorred RGB|HEX`</sub><br />
 <sub>`teamred` Join the red team;</sub><br />
 <sub>`thirdpersonalpha 0-100`</sub><br />
 <sub>`zoomscope 0|1`</sub><br />

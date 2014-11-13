@@ -233,6 +233,7 @@
 <sub>`teleportcn CN X Y Z` Teleport CN from his current position to X Y Z;</sub><br />
 <sub>`typegen "TEXT"` Write TEXT using premade cube fonts;</sub><br />
 <sub>`typegen_font "DiRECTORY"` Change the typegen's font;</sub><br />
+<sub>`unlockmmodels` Loads a shitload of additional mapmodels into the F4 menu; used models have to be linked at the map.cfg</sub><br />
 <sub>`writeprotectogz 0|1` Enable to protect already existing maps from overwriting;</sub><br />
 
 #####₪ New Commands: Events

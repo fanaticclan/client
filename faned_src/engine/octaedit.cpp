@@ -1589,16 +1589,14 @@ COMMAND(pushsel, "i");
 COMMAND(editface, "ii");
 COMMAND(delcube, "");
 
-/////////// texture editing //////////////////
-
 int curtexindex = -1, lasttex = 0, lasttexmillis = -1;
 int texpaneltimer = 0;
 vector<ushort> texmru;
 
-void tofronttex()                                       // maintain most recently used of the texture lists when applying texture
+void tofronttex()
 {
     int c = curtexindex;
-    if(c>=0)
+    if(texmru.inrange(c))
     {
         texmru.insert(0, texmru.remove(c));
         curtexindex = -1;
@@ -1897,6 +1895,7 @@ void edittex_(int *dir)
 {
     if(noedit()) return;
     filltexlist();
+    if(texmru.empty()) return;
     texpaneltimer = 5000;
     if(!(lastsel==sel)) tofronttex();
     curtexindex = clamp(curtexindex<0 ? 0 : curtexindex+*dir, 0, texmru.length()-1);
@@ -2370,7 +2369,7 @@ void rendertexturepanel(int w, int h)
         loopi(7)
         {
             int s = (i == 3 ? 285 : 220), ti = curtexindex+i-3;
-            if(ti>=0 && ti<texmru.length())
+            if(texmru.inrange(ti))
             {
                 VSlot &vslot = lookupvslot(texmru[ti]), *layer = NULL;
                 Slot &slot = *vslot.slot;

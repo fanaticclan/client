@@ -19,11 +19,11 @@ extern ENetAddress masteraddress;
 
 namespace server
 {
-    struct server_entity            // server side version of "entity" type
+    struct server_entity
     {
         int type;
         int spawntime;
-        char spawned;
+        bool spawned;
     };
 
     static const int DEATHMILLIS = 300;
